@@ -2,7 +2,7 @@
 # Thành viên nhóm gồm:
 - Phan Thị Ngân Quỳnh - MSSV: 24100457
 - Nghiêm Thị Mai Diễm - MSSV: 24107772
-- Đặng Ngọc Khuê - MSSV: 24100493
+- Đặng Ngọc Khuê - MSSV: 2410049
 ---
 
 # Restaurant & Hotel management system (RHMS) – Hệ thống quản lý Nhà hàng & Khách sạn
