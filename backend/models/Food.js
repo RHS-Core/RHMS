@@ -25,6 +25,14 @@ export default function defineFoodModel(sequelize) {
         allowNull: true,
         field: 'image_url',
       },
+      category: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.ENUM('AVAILABLE', 'OUT_OF_STOCK'),
         allowNull: false,

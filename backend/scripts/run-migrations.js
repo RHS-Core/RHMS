@@ -1,51 +1,57 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { Umzug, SequelizeStorage } from 'umzug';
 import sequelize from '../config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const umzug = new Umzug({
-  migrations: {
-    glob: 'migrations/*.js',
-    resolve: ({ name, path, context }) => {
-      return {
-        name,
-        path,
-        up: async () => {
-          // Sử dụng pathToFileURL để chuyển đổi đường dẫn tệp sang URL
-          const migration = await import(`file://${path.replace(/\\/g, '/')}`);
-          return migration.up({ context });
-        },
-        down: async () => {
-          const migration = await import(`file://${path.replace(/\\/g, '/')}`);
-          return migration.down({ context });
-        },
-      };
-    },
-  },
-  context: sequelize.getQueryInterface(),
-  storage: new SequelizeStorage({ sequelize }),
-  logger: console,
-});
-
-// Định nghĩa hàm runMigrations để thực thi cấu hình Umzug phía trên
 const runMigrations = async () => {
   try {
-    // Kiểm tra kết nối DB trước khi chạy
     await sequelize.authenticate();
-    console.log('Database connection established successfully. Starting migrations...');
-    
-    // Chạy toàn bộ file migration
-    await umzug.up();
-    console.log('All migrations have been executed successfully! 🎉');
-    process.exit(0);
+
+    const umzug = new Umzug({
+      migrations: {
+        glob: ['*.js', { cwd: path.join(__dirname, '..', 'migrations') }],
+        resolve: ({ name, path: migrationPath }) => {
+          const migrationUrl = pathToFileURL(migrationPath).href;
+          
+          return {
+            name,
+            up: async (params) => {
+              const mod = await import(migrationUrl);
+              // Lấy hàm up từ Named export (export const up) HOẶC Default export (export default)
+              const upFn = mod.up || mod.default?.up;
+              if (typeof upFn !== 'function') {
+                throw new Error(`Migration ${name} lacks a valid 'up' function`);
+              }
+              return upFn(params);
+            },
+            down: async (params) => {
+              const mod = await import(migrationUrl);
+              // Lấy hàm down từ Named export HOẶC Default export
+              const downFn = mod.down || mod.default?.down;
+              if (typeof downFn !== 'function') {
+                throw new Error(`Migration ${name} lacks a valid 'down' function`);
+              }
+              return downFn(params);
+            },
+          };
+        },
+      },
+      context: sequelize.getQueryInterface(),
+      storage: new SequelizeStorage({ sequelize, tableName: 'sequelize_meta' }),
+      logger: console,
+    });
+
+    const executed = await umzug.up();
+    console.log('Migrations completed successfully:', executed.map(m => m.name));
   } catch (error) {
     console.error('Migration failed:', error);
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    await sequelize.close();
   }
 };
 
-// Gọi hàm chạy thực thi
 runMigrations();

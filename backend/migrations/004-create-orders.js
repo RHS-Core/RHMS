@@ -1,51 +1,40 @@
 import { DataTypes } from 'sequelize';
 
 export const up = async ({ context: queryInterface }) => {
-  await queryInterface.createTable('orders', {
+  await queryInterface.createTable('order_items', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
     },
-    user_id: {
+    order_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'orders',
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
+    food_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'foods',
         key: 'id',
       },
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT',
     },
-    table_id: {
+    quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'tables',
-        key: 'id',
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
     },
-    total_price: {
+    price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      defaultValue: 0,
-    },
-    status: {
-      type: DataTypes.ENUM('PENDING', 'PREPARING', 'SERVED', 'COMPLETED'),
-      allowNull: false,
-      defaultValue: 'PENDING',
-    },
-    payment_status: {
-      type: DataTypes.ENUM('UNPAID', 'PAID', 'REFUNDED'),
-      allowNull: false,
-      defaultValue: 'UNPAID',
-    },
-    payment_id: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -61,5 +50,5 @@ export const up = async ({ context: queryInterface }) => {
 };
 
 export const down = async ({ context: queryInterface }) => {
-  await queryInterface.dropTable('orders');
+  await queryInterface.dropTable('order_items');
 };

@@ -20,6 +20,14 @@ export const up = async ({ context: queryInterface }) => {
       type: DataTypes.STRING(500),
       allowNull: true,
     },
+    category: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM('AVAILABLE', 'OUT_OF_STOCK'),
       allowNull: false,
