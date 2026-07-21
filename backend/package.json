@@ -8,14 +8,17 @@
     "migrate": "node scripts/run-migrations.js"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.1",
+    "joi": "^18.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
     "mysql2": "^3.9.7",
     "sequelize": "^6.37.3",
-    "umzug": "^3.8.3"
+    "umzug": "^3.8.3",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

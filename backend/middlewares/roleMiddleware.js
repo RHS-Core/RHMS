@@ -1,15 +1,4 @@
-export const roleMiddleware = (allowedRoles = []) => (req, res, next) => {
-  const currentRole = req.user?.role;
+import roleMiddleware from './role.middleware.js';
 
-  if (!currentRole || !allowedRoles.includes(currentRole)) {
-    return res.status(403).json({
-      success: false,
-      message: 'Forbidden',
-      errors: [`Required role: ${allowedRoles.join(' or ')}`],
-    });
-  }
-
-  return next();
-};
-
+export { roleMiddleware };
 export default roleMiddleware;
