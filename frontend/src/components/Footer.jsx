@@ -1,19 +1,13 @@
 import React from "react";
+
 function Footer() {
-  return (
-    <footer
-      style={{
-        height: "60px",
-        background: "#1976d2",
-        color: "white",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      © 2026 RHMS
-    </footer>
-  );
+    return (
+        <footer className="bg-primary text-white text-center py-3">
+
+            © 2026 RHMS - Restaurant & Hotel Management System
+
+        </footer>
+    );
 }
 
 export default Footer;

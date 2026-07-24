@@ -1,10 +1,26 @@
-import React from 'react';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-export default function App() {
+import Layout from "./components/Layout";
+
+import Dashboard from "./pages/hotel/Dashboard";
+import Rooms from "./pages/hotel/Rooms";
+import Booking from "./pages/hotel/Booking";
+import CheckIn from "./pages/hotel/CheckIn";
+import CheckOut from "./pages/hotel/CheckOut";
+
+function App() {
   return (
-    <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      <h1 style={{ color: '#4680de' }}>Phan Thị Ngân Quỳnh</h1>
-      <p style={{ color: '#a6bfe1' }}>Kei, check</p>
-    </div>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/rooms" element={<Rooms />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/checkin" element={<CheckIn />} />
+        <Route path="/checkout" element={<CheckOut />} />
+      </Routes>
+    </Layout>
   );
 }
+
+export default App;
