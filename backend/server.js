@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDatabase } from './config/database.js';
 import restaurantRoutes from './modules/restaurant/restaurantRoutes.js';
+import paymentRoutes from './modules/payment/paymentRoutes.js';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const app = express();
@@ -19,6 +20,7 @@ app.get('/api/ping', (req, res) => {
 });
 
 app.use('/api', restaurantRoutes);
+app.use('/api', paymentRoutes);
 
 app.use(errorMiddleware);
 
