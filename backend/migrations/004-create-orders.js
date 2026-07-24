@@ -28,13 +28,13 @@ export const up = async ({ context: queryInterface }) => {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     },
-    total_amount: {
+    total_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       defaultValue: 0.00,
     },
     status: {
-      type: DataTypes.ENUM('PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED'),
+      type: DataTypes.ENUM('PENDING', 'PREPARING', 'SERVED', 'COMPLETED', 'CANCELLED'),
       allowNull: false,
       defaultValue: 'PENDING',
     },

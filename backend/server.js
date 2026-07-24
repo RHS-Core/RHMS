@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes.js';
 import foodRoutes from './routes/food.routes.js';
 import tableRoutes from './routes/table.routes.js';
 import orderRoutes from './routes/order.routes.js';
+import userRoutes from './routes/user.routes.js';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const app = express();
@@ -23,6 +24,7 @@ app.get('/api/ping', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/tables', tableRoutes);
 app.use('/api/orders', orderRoutes);

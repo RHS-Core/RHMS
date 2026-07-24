@@ -40,6 +40,11 @@ export const deleteTable = async (id) => {
   return true;
 };
 
+/**
+ * Đặt bàn tạm thời bằng cách chuyển trạng thái bàn sang RESERVED.
+ * Đây chỉ là logic giữ chỗ trước khi khách thực sự ngồi vào bàn và chuyển sang OCCUPIED,
+ * không tạo một bản ghi riêng trong bảng Reservation như hệ thống đặt bàn đầy đủ.
+ */
 export const reserveTable = async (id) => {
   const table = await getTableById(id);
 

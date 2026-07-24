@@ -41,6 +41,8 @@ export const createOrderSchema = Joi.object({
     'array.min': 'At least one item is required.',
     'any.required': 'Items are required.',
   }),
+  status: Joi.string().valid('PENDING', 'COMPLETED').optional(),
+  paymentStatus: Joi.string().valid('UNPAID', 'PAID').optional(),
 });
 
 export const updateOrderStatusSchema = Joi.object({

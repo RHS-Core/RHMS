@@ -12,6 +12,11 @@ export const up = async ({ context: queryInterface }) => {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
+    username: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      unique: true,
+    },
     email: {
       type: DataTypes.STRING(150),
       allowNull: false,
@@ -22,9 +27,14 @@ export const up = async ({ context: queryInterface }) => {
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('ADMIN', 'STAFF', 'CUSTOMER'),
+      type: DataTypes.ENUM('Customer', 'RestaurantStaff', 'HotelStaff', 'RestaurantManager', 'HotelManager', 'SuperAdmin'),
       allowNull: false,
-      defaultValue: 'CUSTOMER',
+      defaultValue: 'Customer',
+    },
+    status: {
+      type: DataTypes.ENUM('ACTIVE', 'INACTIVE'),
+      allowNull: false,
+      defaultValue: 'ACTIVE',
     },
     created_at: {
       type: DataTypes.DATE,
