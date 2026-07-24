@@ -4,31 +4,32 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 
 function Layout({ children }) {
-  return (
-    <>
-      <Header />
 
-      <div
-        style={{
-          display: "flex",
-          minHeight: "calc(100vh - 130px)",
-        }}
-      >
-        <Sidebar />
+    return (
 
-        <main
-          style={{
-            flex: 1,
-            padding: "20px",
-          }}
-        >
-          {children}
-        </main>
-      </div>
+        <>
 
-      <Footer />
-    </>
-  );
+            <Header />
+
+            <div className="d-flex">
+
+                <Sidebar />
+
+                <div
+                    className="p-4 flex-grow-1 bg-light"
+                    style={{ minHeight: "100vh" }}
+                >
+                    {children}
+                </div>
+
+            </div>
+
+            <Footer />
+
+        </>
+
+    );
+
 }
 
 export default Layout;
