@@ -26,6 +26,8 @@ export const createOrderHandler = async (req, res, next) => {
       userId: req.user?.id || null,
       tableId: value.tableId,
       items: value.items,
+      status: value.status || 'PENDING',
+      paymentStatus: value.paymentStatus,
     });
 
     return res.status(201).json({

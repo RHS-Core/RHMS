@@ -11,7 +11,7 @@ const resolveTableStatusAfterOrder = (status) => {
   return 'OCCUPIED';
 };
 
-export const createOrder = async ({ userId, tableId, items }) => {
+export const createOrder = async ({ userId, tableId, items, status, paymentStatus }) => {
   const table = await Table.findByPk(tableId);
   if (!table) {
     const error = new Error('Table not found.');
@@ -33,6 +33,8 @@ export const createOrder = async ({ userId, tableId, items }) => {
     return sum + Number(item.quantity) * Number(food.price);
   }, 0);
 
+  const orderStatus = status || 'PENDING';
+  const orderPaymentStatus = paymentStatus || (orderStatus === 'COMPLETED' ? 'PAID' : 'UNPAID');
   const transaction = await sequelize.transaction();
 
   try {
@@ -41,8 +43,8 @@ export const createOrder = async ({ userId, tableId, items }) => {
         userId: userId || null,
         tableId,
         totalPrice: subtotal,
-        status: 'PENDING',
-        paymentStatus: 'UNPAID',
+        status: orderStatus,
+        paymentStatus: orderPaymentStatus,
       },
       { transaction }
     );
@@ -55,7 +57,9 @@ export const createOrder = async ({ userId, tableId, items }) => {
     }));
 
     await OrderItem.bulkCreate(orderItems, { transaction });
-    await table.update({ status: 'OCCUPIED' }, { transaction });
+
+    const nextTableStatus = orderStatus === 'COMPLETED' ? 'CLEANING' : 'OCCUPIED';
+    await table.update({ status: nextTableStatus }, { transaction });
 
     await transaction.commit();
     return order;

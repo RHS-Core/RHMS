@@ -12,7 +12,7 @@ import {
 
 const router = Router();
 
-router.get('/', authMiddleware, roleMiddleware(['RestaurantStaff', 'RestaurantManager']), listTables);
+router.get('/', authMiddleware, roleMiddleware(['Customer', 'RestaurantStaff', 'RestaurantManager']), listTables);
 router.get('/:id', authMiddleware, roleMiddleware(['RestaurantStaff', 'RestaurantManager']), getTableHandler);
 router.post('/', authMiddleware, roleMiddleware(['RestaurantManager']), createTableHandler);
 router.put('/:id', authMiddleware, roleMiddleware(['RestaurantStaff', 'RestaurantManager']), updateTableStatusHandler);

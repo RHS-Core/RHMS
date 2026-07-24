@@ -13,6 +13,11 @@ export default function defineUserModel(sequelize) {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      username: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        unique: true,
+      },
       email: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -29,9 +34,14 @@ export default function defineUserModel(sequelize) {
         },
       },
       role: {
-        type: DataTypes.ENUM('Customer', 'RestaurantStaff', 'RestaurantManager'),
+        type: DataTypes.ENUM('Customer', 'RestaurantStaff', 'HotelStaff', 'RestaurantManager', 'HotelManager', 'SuperAdmin'),
         allowNull: false,
         defaultValue: 'Customer',
+      },
+      status: {
+        type: DataTypes.ENUM('ACTIVE', 'INACTIVE'),
+        allowNull: false,
+        defaultValue: 'ACTIVE',
       },
     },
     {
