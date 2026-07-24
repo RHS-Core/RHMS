@@ -10,42 +10,33 @@ export const up = async ({ context: queryInterface }) => {
     },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'users',
         key: 'id',
       },
       onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
+      onDelete: 'SET NULL',
     },
     table_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'tables',
         key: 'id',
       },
       onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
+      onDelete: 'SET NULL',
     },
     total_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: 0.00,
     },
     status: {
-      type: DataTypes.ENUM('PENDING', 'PREPARING', 'SERVED', 'COMPLETED'),
+      type: DataTypes.ENUM('PENDING', 'PREPARING', 'SERVED', 'COMPLETED', 'CANCELLED'),
       allowNull: false,
       defaultValue: 'PENDING',
-    },
-    payment_status: {
-      type: DataTypes.ENUM('UNPAID', 'PAID', 'REFUNDED'),
-      allowNull: false,
-      defaultValue: 'UNPAID',
-    },
-    payment_id: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,
