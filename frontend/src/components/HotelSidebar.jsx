@@ -1,12 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext.jsx';
 
-const menuItems = [
-  { label: 'Phòng', path: '/hotel/rooms', icon: 'bi-door-open' },
-  { label: 'Đặt phòng', path: '/hotel/booking', icon: 'bi-calendar-check' },
-  { label: 'Dịch vụ', path: '/hotel/dashboard', icon: 'bi-stars' },
-];
-
 export default function HotelSidebar() {
   const { user } = useAuthContext();
   const location = useLocation();
@@ -15,9 +9,29 @@ export default function HotelSidebar() {
     return null;
   }
 
-  if (!user?.role || !user.role.includes('Hotel') && user?.role !== 'SuperAdmin' && user?.role !== 'Customer') {
+  const role = user?.role;
+
+  // Kiểm tra quyền truy cập vào phân hệ Khách sạn
+  if (!role || (!role.includes('Hotel') && role !== 'SuperAdmin' && role !== 'Customer')) {
     return null;
   }
+
+  // 1. Menu cơ bản dành cho tất cả mọi người (kể cả Customer)
+  const menuItems = [
+    { label: 'Phòng', path: '/hotel/rooms', icon: 'bi-door-open' },
+    { label: 'Đặt phòng', path: '/hotel/booking', icon: 'bi-calendar-check' },
+  ];
+
+  // 2. Thêm Check-in & Check-out chỉ cho Nhân viên / Quản lý / Admin
+  if (role.includes('Hotel') || role === 'SuperAdmin') {
+    menuItems.push(
+      { label: 'Check-in', path: '/hotel/checkin', icon: 'bi-box-arrow-in-right' },
+      { label: 'Check-out', path: '/hotel/checkout', icon: 'bi-box-arrow-right' }
+    );
+  }
+
+  // 3. Mục Dịch vụ
+  menuItems.push({ label: 'Dịch vụ', path: '/hotel/dashboard', icon: 'bi-stars' });
 
   const isActive = (path) => location.pathname === path;
 
