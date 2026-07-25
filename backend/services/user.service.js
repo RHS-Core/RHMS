@@ -67,4 +67,61 @@ export const updateUserStatusService = async (userId, status) => {
   return buildUserResponse(user);
 };
 
-export default { getUsersService, createUserService, updateUserStatusService };
+export const resetUserPasswordService = async (userId, newPassword) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  return buildUserResponse(user);
+};
+
+export const deleteUserService = async (userId) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (user.role === 'SuperAdmin') {
+    const error = new Error('Cannot delete SuperAdmin user.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  await user.destroy();
+
+  return { id: userId, deleted: true };
+};
+
+export const changeMyPasswordService = async (userId, oldPassword, newPassword) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) {
+    const error = new Error('Mật khẩu hiện tại không đúng.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  return buildUserResponse(user);
+};
+
+export default { getUsersService, createUserService, updateUserStatusService, resetUserPasswordService, deleteUserService, changeMyPasswordService };

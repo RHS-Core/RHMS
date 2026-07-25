@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext(null);
 
@@ -14,6 +15,7 @@ export const AuthProvider = ({ children }) => {
         const savedUser = localStorage.getItem('user');
 
         if (savedToken && savedUser) {
+          axios.defaults.headers.common.Authorization = `Bearer ${savedToken}`;
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
         }
@@ -31,6 +33,7 @@ export const AuthProvider = ({ children }) => {
     try {
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
+      axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
       setToken(newToken);
       setUser(userData);
     } catch (error) {
@@ -43,6 +46,7 @@ export const AuthProvider = ({ children }) => {
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      delete axios.defaults.headers.common.Authorization;
       setToken(null);
       setUser(null);
     } catch (error) {
