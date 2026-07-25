@@ -28,6 +28,14 @@ export const up = async ({ context: queryInterface }) => {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     },
+    hotel_booking_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    room_number: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
     total_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,

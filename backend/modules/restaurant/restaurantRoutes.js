@@ -2,17 +2,14 @@ import { Router } from 'express';
 import authMiddleware from '../../middlewares/authMiddleware.js';
 import roleMiddleware from '../../middlewares/roleMiddleware.js';
 import { register, login, me } from './authController.js';
+import { successResponse } from '../../utils/apiResponse.js';
 
 const router = Router();
 
 router.get('/restaurant/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Restaurant module is healthy',
-    data: {
-      module: 'restaurant',
-      status: 'ok',
-    },
+  return successResponse(res, 200, 'Restaurant module is healthy', {
+    module: 'restaurant',
+    status: 'ok',
   });
 });
 
@@ -24,11 +21,7 @@ router.get(
   authMiddleware,
   roleMiddleware(['RestaurantManager']),
   (req, res) => {
-    res.status(200).json({
-      success: true,
-      message: 'Manager access granted.',
-      data: { user: req.user },
-    });
+    return successResponse(res, 200, 'Manager access granted.', { user: req.user });
   }
 );
 

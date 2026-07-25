@@ -5,7 +5,7 @@ export const roleMiddleware = (allowedRoles = []) => (req, res, next) => {
     return res.status(403).json({
       success: false,
       message: 'Forbidden',
-      errors: [`Required role: ${allowedRoles.join(' or ')}`],
+      errors: null,
     });
   }
 
