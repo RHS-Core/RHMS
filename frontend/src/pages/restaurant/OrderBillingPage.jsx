@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import { createOrder } from '../../services/orderService.js';
 import { getFoods } from '../../services/foodService.js';
@@ -8,6 +9,7 @@ const STORAGE_KEY = 'restaurantCart';
 
 export default function OrderBillingPage() {
   const { user } = useAuthContext();
+  const [searchParams] = useSearchParams();
   const [foods, setFoods] = useState([]);
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
@@ -41,7 +43,14 @@ export default function OrderBillingPage() {
         setTables(tableList);
         const storedCart = loadCart();
         setItems(storedCart);
-        setSelectedTable(tableList[0]?.id ?? null);
+        
+        // Lấy tableId từ query param hoặc default
+        const tableIdFromUrl = searchParams.get('tableId');
+        if (tableIdFromUrl) {
+          setSelectedTable(tableIdFromUrl);
+        } else {
+          setSelectedTable(tableList[0]?.id ?? null);
+        }
       } catch (error) {
         setToast('Không thể tải dữ liệu gọi món.');
       } finally {
@@ -50,7 +59,7 @@ export default function OrderBillingPage() {
     };
 
     loadData();
-  }, []);
+  }, [searchParams]);
 
   const addItem = (food) => {
     setItems((prev) => {

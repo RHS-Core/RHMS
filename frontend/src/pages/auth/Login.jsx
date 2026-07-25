@@ -38,9 +38,13 @@ export default function Login() {
       const role = userData.role;
       if (role === 'Customer') {
         navigate('/portal');
-      } else if (role === 'RestaurantStaff' || role === 'RestaurantManager') {
+      } else if (role === 'RestaurantStaff') {
+        navigate('/restaurant/orders');
+      } else if (role === 'RestaurantManager') {
         navigate('/restaurant/dashboard');
-      } else if (role === 'HotelStaff' || role === 'HotelManager') {
+      } else if (role === 'HotelStaff') {
+        navigate('/hotel/rooms');
+      } else if (role === 'HotelManager') {
         navigate('/hotel/dashboard');
       } else if (role === 'SuperAdmin') {
         navigate('/admin/dashboard');

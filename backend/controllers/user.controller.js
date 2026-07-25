@@ -1,4 +1,4 @@
-import { getUsersService, createUserService, updateUserStatusService } from '../services/user.service.js';
+import { getUsersService, createUserService, updateUserStatusService, resetUserPasswordService, deleteUserService, changeMyPasswordService } from '../services/user.service.js';
 import { createUserSchema, updateUserStatusSchema } from '../validators/user.validator.js';
 
 export const getUsers = async (req, res, next) => {
@@ -73,4 +73,59 @@ export const updateUserStatus = async (req, res, next) => {
   }
 };
 
-export default { getUsers, createUser, updateUserStatus };
+export const resetUserPassword = async (req, res, next) => {
+  try {
+    const { newPassword } = req.body;
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.trim().length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: ['newPassword must be at least 6 characters long.'],
+      });
+    }
+
+    const result = await resetUserPasswordService(req.params.id, newPassword.trim());
+    return res.status(200).json({ success: true, message: 'User password reset successfully', data: result });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const result = await deleteUserService(req.params.id);
+    return res.status(200).json({ success: true, message: 'User deleted successfully', data: result });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const changeMyPassword = async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword || typeof oldPassword !== 'string' || typeof newPassword !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: ['oldPassword and newPassword are required.'],
+      });
+    }
+
+    if (newPassword.trim().length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: ['newPassword must be at least 6 characters long.'],
+      });
+    }
+
+    const result = await changeMyPasswordService(req.user.id, oldPassword.trim(), newPassword.trim());
+    return res.status(200).json({ success: true, message: 'Password updated successfully', data: result });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export default { getUsers, createUser, updateUserStatus, resetUserPassword, deleteUser, changeMyPassword };

@@ -16,11 +16,11 @@ export default function Header() {
   };
 
   const handleSwitchPortal = () => {
-    if (user?.role === 'SuperAdmin') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/portal');
-    }
+    navigate('/portal');
+  };
+
+  const handleProfile = () => {
+    navigate('/customer/profile');
   };
 
   const handleLogout = async () => {
@@ -55,8 +55,11 @@ export default function Header() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {['Customer', 'SuperAdmin'].includes(user?.role) && (
-            <Button onClick={handleSwitchPortal} className="bg-slate-800 hover:bg-slate-900">Chuyển phân hệ</Button>
+          {user?.role === 'Customer' && (
+            <>
+              <Button onClick={handleProfile} className="bg-slate-700 hover:bg-slate-800">Hồ sơ</Button>
+              <Button onClick={handleSwitchPortal} className="bg-slate-800 hover:bg-slate-900">Chuyển phân hệ</Button>
+            </>
           )}
           <Button onClick={handleLogout} className="bg-rose-600 hover:bg-rose-700">Đăng xuất</Button>
         </div>

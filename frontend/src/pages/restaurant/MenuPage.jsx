@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext.jsx';
-import { createFood, getFoods } from '../../services/foodService.js';
+import { createFood, getFoods, deleteFood, updateFood } from '../../services/foodService.js';
 
 const categories = ['All', 'Khai vị', 'Món chính', 'Tráng miệng', 'Đồ uống'];
 const categoryMap = {
@@ -12,6 +12,8 @@ const categoryMap = {
   'Đồ uống': 'Drink',
 };
 
+const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=No+Image';
+
 export default function MenuPage() {
   const { user } = useAuthContext();
   const [foods, setFoods] = useState([]);
@@ -21,11 +23,15 @@ export default function MenuPage() {
   const [sortOrder, setSortOrder] = useState('asc');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
+  const [imagePreview, setImagePreview] = useState('');
   const [toast, setToast] = useState('');
+  const [imageFile, setImageFile] = useState(null);
 
   const navigate = useNavigate();
   const canManage = ['RestaurantManager', 'SuperAdmin'].includes(user?.role);
+  const isCustomer = user?.role === 'Customer';
 
   const addToCart = (food) => {
     const existingCart = JSON.parse(localStorage.getItem('restaurantCart') || '[]');
@@ -39,6 +45,13 @@ export default function MenuPage() {
     }
 
     localStorage.setItem('restaurantCart', JSON.stringify(nextCart));
+    setToast('✓ Thêm vào đơn hàng thành công!');
+    setTimeout(() => setToast(''), 2000);
+  };
+
+  const createOrder = (food) => {
+    const cartItem = { foodId: food.id, name: food.name, price: Number(food.price || 0), qty: 1 };
+    localStorage.setItem('restaurantCart', JSON.stringify([cartItem]));
     navigate('/restaurant/orders');
   };
 
@@ -75,22 +88,79 @@ export default function MenuPage() {
       });
   }, [foods, activeCategory, search, sortOrder, statusFilter]);
 
-  const handleCreateFood = async (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+        setForm({ ...form, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUrlChange = (value) => {
+    setForm({ ...form, imageUrl: value });
+    setImagePreview(value || DEFAULT_IMAGE);
+  };
+
+  const openModal = (food = null) => {
+    if (food) {
+      setEditingId(food.id);
+      setForm({ name: food.name, category: food.category, price: food.price, imageUrl: food.imageUrl || '', description: food.description || '' });
+      setImagePreview(food.imageUrl || DEFAULT_IMAGE);
+    } else {
+      setEditingId(null);
+      setForm({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
+      setImagePreview(DEFAULT_IMAGE);
+    }
+    setImageFile(null);
+    setShowModal(true);
+  };
+
+  const handleSaveFood = async (e) => {
     e.preventDefault();
+    if (!form.name || !form.price) {
+      setToast('Vui lòng nhập tên và giá tiền.');
+      return;
+    }
+
     try {
-      await createFood({
+      const payload = {
         name: form.name,
         category: form.category,
         price: Number(form.price),
         imageUrl: form.imageUrl,
         description: form.description,
-      });
-      setToast('Thêm món mới thành công!');
+      };
+
+      if (editingId) {
+        await updateFood(editingId, payload);
+        setToast('Cập nhật món ăn thành công!');
+      } else {
+        await createFood(payload);
+        setToast('Thêm món mới thành công!');
+      }
+
       setShowModal(false);
       setForm({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
+      setImagePreview('');
       loadFoods();
     } catch (error) {
-      setToast('Thêm món thất bại.');
+      setToast(editingId ? 'Cập nhật thất bại.' : 'Thêm món thất bại.');
+    }
+  };
+
+  const handleDeleteFood = async (id) => {
+    if (!window.confirm('Bạn chắc chắn muốn xóa món ăn này?')) return;
+    try {
+      await deleteFood(id);
+      setToast('Xóa món ăn thành công!');
+      loadFoods();
+    } catch (error) {
+      setToast('Xóa thất bại.');
     }
   };
 
@@ -103,12 +173,19 @@ export default function MenuPage() {
             <p className="text-sm text-slate-500">Tìm món, sắp xếp và quản lý menu nhà hàng.</p>
           </div>
           {canManage && (
-            <button onClick={() => setShowModal(true)} className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white">+ Thêm món mới</button>
+            <button onClick={() => openModal()} className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700">
+              + Thêm món mới
+            </button>
           )}
         </div>
 
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm kiếm món ăn..." className="w-full rounded-lg border border-slate-300 px-3 py-2 md:max-w-sm" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm kiếm món ăn..."
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 md:max-w-sm"
+          />
           <div className="flex gap-2">
             <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2">
               <option value="asc">Giá tăng dần</option>
@@ -124,36 +201,100 @@ export default function MenuPage() {
 
         <div className="mb-6 flex flex-wrap gap-2">
           {categories.map((cat) => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} className={`rounded-full px-4 py-2 text-sm ${activeCategory === cat ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}`}>
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                activeCategory === cat
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
               {cat}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="py-8 text-center text-slate-500">Đang tải thực đơn...</div>
+          <div className="py-8 text-center text-slate-500">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
+            <p className="mt-2">Đang tải thực đơn...</p>
+          </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredFoods.map((food) => (
-              <div key={food.id} className="rounded-xl border border-slate-200 p-4 shadow-sm">
-                <div className="mb-3 h-32 rounded-lg bg-slate-100" />
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-semibold">{food.name}</h3>
-                    <p className="text-sm text-slate-500">{food.description || 'Món ăn đặc biệt'}</p>
-                  </div>
-                  <span className={`rounded-full px-2 py-1 text-xs ${food.status === 'AVAILABLE' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{food.status || 'AVAILABLE'}</span>
+              <div key={food.id} className="overflow-hidden rounded-xl border border-slate-200 shadow-sm transition hover:shadow-lg">
+                <div className="h-32 bg-slate-100">
+                  <img
+                    src={food.imageUrl || DEFAULT_IMAGE}
+                    alt={food.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => (e.target.src = DEFAULT_IMAGE)}
+                  />
                 </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-lg font-semibold text-blue-700">{Number(food.price || 0).toLocaleString('vi-VN')}₫</span>
-                  {user?.role === 'Customer' ? (
-                    <button onClick={() => addToCart(food)} className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white">Đặt món</button>
-                  ) : (
-                    <div className="flex gap-2">
-                      <button className="rounded-lg bg-slate-200 px-3 py-2 text-sm">Sửa</button>
-                      <button className="rounded-lg bg-rose-600 px-3 py-2 text-sm text-white">Xóa</button>
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold">{food.name}</h3>
+                      <p className="text-sm text-slate-500">{food.description || 'Món ăn đặc biệt'}</p>
                     </div>
-                  )}
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        food.status === 'AVAILABLE'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-rose-100 text-rose-700'
+                      }`}
+                    >
+                      {food.status || 'AVAILABLE'}
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-lg font-semibold text-blue-700">
+                      {Number(food.price || 0).toLocaleString('vi-VN')}₫
+                    </span>
+                  </div>
+
+                  {/* Nút thao tác theo role */}
+                  <div className="mt-4 flex gap-2">
+                    {isCustomer ? (
+                      <>
+                        <button
+                          onClick={() => addToCart(food)}
+                          className="flex-1 rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white hover:bg-amber-600"
+                        >
+                          Thêm vào đơn
+                        </button>
+                        <button
+                          onClick={() => createOrder(food)}
+                          className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                          Đặt ngay
+                        </button>
+                      </>
+                    ) : user?.role === 'RestaurantStaff' ? (
+                      <button
+                        onClick={() => createOrder(food)}
+                        className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                      >
+                        Tạo đơn tại bàn
+                      </button>
+                    ) : canManage ? (
+                      <>
+                        <button
+                          onClick={() => openModal(food)}
+                          className="flex-1 rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-300"
+                        >
+                          ✎ Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFood(food.id)}
+                          className="flex-1 rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
+                        >
+                          ✕ Xóa
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}
@@ -161,31 +302,98 @@ export default function MenuPage() {
         )}
       </div>
 
+      {/* Modal thêm/sửa món */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="mb-4 text-xl font-semibold">Thêm món mới</h3>
-            <form onSubmit={handleCreateFood} className="space-y-3">
-              <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Tên món" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2">
+            <h3 className="mb-4 text-xl font-semibold">{editingId ? 'Chỉnh sửa món ăn' : 'Thêm món mới'}</h3>
+            <form onSubmit={handleSaveFood} className="space-y-3">
+              {/* Image preview */}
+              {imagePreview && (
+                <div className="flex justify-center">
+                  <img src={imagePreview} alt="Preview" className="h-40 w-40 rounded-lg object-cover" />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium">Image URL</label>
+                <input
+                  type="text"
+                  value={form.imageUrl}
+                  onChange={(e) => handleImageUrlChange(e.target.value)}
+                  placeholder="https://..."
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Upload ảnh</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Tên món"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
                 <option value="Appetizer">Khai vị</option>
                 <option value="MainCourse">Món chính</option>
                 <option value="Dessert">Tráng miệng</option>
                 <option value="Drink">Đồ uống</option>
               </select>
-              <input required type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Giá" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
-              <input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="Link ảnh" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Mô tả" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
+              <input
+                required
+                type="number"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                placeholder="Giá"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                placeholder="Mô tả"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                rows="3"
+              />
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setShowModal(false)} className="rounded-lg bg-slate-200 px-4 py-2">Hủy</button>
-                <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-white">Lưu món</button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="rounded-lg bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                >
+                  {editingId ? 'Cập nhật' : 'Lưu'} món
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {toast && <div className="fixed bottom-4 right-4 rounded-lg bg-slate-800 px-4 py-2 text-sm text-white">{toast}</div>}
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-4 right-4 rounded-lg bg-slate-800 px-4 py-2 text-sm text-white">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
