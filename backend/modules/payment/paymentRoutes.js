@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { create } from "./paymentController.js";
 const router = Router();
 router.get("/payment/health", (req, res) => {
     res.status(200).json({
@@ -10,4 +11,5 @@ router.get("/payment/health", (req, res) => {
         },
     });
 });
+router.post("/payment", create);
 export default router;
