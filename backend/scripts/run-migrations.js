@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 const runMigrations = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connected successfully.');
 
     const umzug = new Umzug({
       migrations: {
@@ -17,15 +16,11 @@ const runMigrations = async () => {
       },
       context: sequelize.getQueryInterface(),
       storage: new SequelizeStorage({ sequelize, tableName: 'sequelize_meta' }),
-      logger: console,
+      logger: undefined,
     });
 
     const executed = await umzug.up();
-    if (executed.length === 0) {
-      console.log('No pending migrations to run.');
-    } else {
-      console.log('Migrations completed successfully:', executed.map(m => m.name));
-    }
+    return executed;
   } catch (error) {
     console.error('Migration failed:', error);
     process.exitCode = 1;

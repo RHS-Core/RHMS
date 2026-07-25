@@ -1,0 +1,599 @@
+{
+  "info": {
+    "_postman_id": "c5f1f3d2-4a2c-4f8c-9f0d-7a4e7e67aa11",
+    "name": "RHMS API Collection",
+    "description": "RHMS Restaurant & Hotel API collection for existing backend routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01. Auth & Profile",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nguyen Van A\",\n  \"username\": \"customer01\",\n  \"email\": \"customer01@rhms.local\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Create a new customer account."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"customer01@rhms.local\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "    var jsonData = pm.response.json();",
+                    "    if (jsonData.data && jsonData.data.token) {",
+                    "        pm.environment.set(\"token\", jsonData.data.token);",
+                    "    }",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "description": "Login and automatically save token to the active environment."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurant/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurant", "auth", "me"]
+            },
+            "description": "Get the authenticated restaurant profile."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02. SuperAdmin Management",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            },
+            "description": "List all users for SuperAdmin, RestaurantManager, and HotelManager."
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hotel Staff\",\n  \"username\": \"hotelstaff02\",\n  \"email\": \"hotelstaff02@rhms.local\",\n  \"password\": \"Staff12345\",\n  \"role\": \"HotelStaff\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "create"]
+            },
+            "description": "Create a staff or manager account based on permissions."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{userId}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{userId}}", "status"]
+            },
+            "description": "Activate or deactivate a user."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset User Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"NewPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{userId}}/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{userId}}", "reset-password"]
+            },
+            "description": "Reset a user password."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{userId}}"]
+            },
+            "description": "Delete a user account."
+          },
+          "response": []
+        },
+        {
+          "name": "Change My Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"CurrentPassword123\",\n  \"newPassword\": \"NewPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/change-my-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "change-my-password"]
+            },
+            "description": "Change the current authenticated user password."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03. Restaurant Module",
+      "item": [
+        {
+          "name": "Menu - List Foods",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/foods",
+              "host": ["{{base_url}}"],
+              "path": ["api", "foods"]
+            },
+            "description": "Get all food items."
+          },
+          "response": []
+        },
+        {
+          "name": "Menu - Get Food By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/foods/{{foodId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "foods", "{{foodId}}"]
+            },
+            "description": "Get food detail by id."
+          },
+          "response": []
+        },
+        {
+          "name": "Menu - Create Food",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grilled Salmon\",\n  \"price\": 180000,\n  \"category\": \"Main\",\n  \"description\": \"Fresh grilled salmon\",\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/foods",
+              "host": ["{{base_url}}"],
+              "path": ["api", "foods"]
+            },
+            "description": "Create a food item for restaurant menu."
+          },
+          "response": []
+        },
+        {
+          "name": "Menu - Update Food",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grilled Salmon Deluxe\",\n  \"price\": 190000,\n  \"category\": \"Main\",\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/foods/{{foodId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "foods", "{{foodId}}"]
+            },
+            "description": "Update a menu item."
+          },
+          "response": []
+        },
+        {
+          "name": "Menu - Delete Food",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/foods/{{foodId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "foods", "{{foodId}}"]
+            },
+            "description": "Delete a food item."
+          },
+          "response": []
+        },
+        {
+          "name": "Tables - List Tables",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables"]
+            },
+            "description": "List available tables."
+          },
+          "response": []
+        },
+        {
+          "name": "Tables - Get Table By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables/{{tableId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "{{tableId}}"]
+            },
+            "description": "Get a table by id."
+          },
+          "response": []
+        },
+        {
+          "name": "Tables - Create Table",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableNumber\": 6,\n  \"capacity\": 4,\n  \"status\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables"]
+            },
+            "description": "Create a new restaurant table."
+          },
+          "response": []
+        },
+        {
+          "name": "Tables - Update Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"OCCUPIED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables/{{tableId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "{{tableId}}"]
+            },
+            "description": "Update table status."
+          },
+          "response": []
+        },
+        {
+          "name": "Tables - Reserve",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables/{{tableId}}/reserve",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "{{tableId}}", "reserve"]
+            },
+            "description": "Reserve a table."
+          },
+          "response": []
+        },
+        {
+          "name": "Orders - Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tableId\": 1,\n  \"hotelBookingId\": 1001,\n  \"roomNumber\": \"1208\",\n  \"items\": [\n    { \"foodId\": 1, \"quantity\": 2 },\n    { \"foodId\": 2, \"quantity\": 1 }\n  ],\n  \"status\": \"PENDING\",\n  \"paymentStatus\": \"UNPAID\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Create a restaurant order and optionally attach hotel booking info."
+          },
+          "response": []
+        },
+        {
+          "name": "Orders - List Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "List restaurant orders."
+          },
+          "response": []
+        },
+        {
+          "name": "Orders - Get Order By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{orderId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{orderId}}"]
+            },
+            "description": "Get order detail."
+          },
+          "response": []
+        },
+        {
+          "name": "Orders - Update Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PREPARING\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{orderId}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{orderId}}", "status"]
+            },
+            "description": "Update order status."
+          },
+          "response": []
+        },
+        {
+          "name": "Orders - Update Items",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"foodId\": 1, \"quantity\": 3 },\n    { \"foodId\": 2, \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{orderId}}/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{orderId}}", "items"]
+            },
+            "description": "Update order items."
+          },
+          "response": []
+        },
+        {
+          "name": "Billing - Restaurant Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/restaurant/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "restaurant", "health"]
+            },
+            "description": "Restaurant module health endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Billing - Payment Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payment/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payment", "health"]
+            },
+            "description": "Payment module health endpoint."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04. Hotel Module",
+      "item": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "1" },
+    { "key": "tableId", "value": "1" },
+    { "key": "roomId", "value": "1" }
+  ]
+}

@@ -9,7 +9,7 @@ export const authMiddleware = (req, res, next) => {
     return res.status(401).json({
       success: false,
       message: 'Unauthorized',
-      errors: ['Missing or invalid Authorization header.'],
+      errors: null,
     });
   }
 
@@ -23,7 +23,7 @@ export const authMiddleware = (req, res, next) => {
     return res.status(401).json({
       success: false,
       message: 'Unauthorized',
-      errors: ['Invalid or expired token.'],
+      errors: null,
     });
   }
 };

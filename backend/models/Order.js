@@ -19,6 +19,16 @@ export default function defineOrderModel(sequelize) {
         allowNull: false,
         field: 'table_id',
       },
+      hotelBookingId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'hotel_booking_id',
+      },
+      roomNumber: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        field: 'room_number',
+      },
       totalPrice: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,

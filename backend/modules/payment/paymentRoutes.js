@@ -1,15 +1,12 @@
 import { Router } from "express";
+import { successResponse } from '../../utils/apiResponse.js';
 import { create, methods } from "./paymentController.js";
 
 const router = Router();
 router.get("/payment/health", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Payment module is healthy",
-        data: {
-            module: "payment",
-            status: "ok",
-        },
+    return successResponse(res, 200, "Payment module is healthy", {
+        module: "payment",
+        status: "ok",
     });
 });
 

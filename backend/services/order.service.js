@@ -11,7 +11,7 @@ const resolveTableStatusAfterOrder = (status) => {
   return 'OCCUPIED';
 };
 
-export const createOrder = async ({ userId, tableId, items, status, paymentStatus }) => {
+export const createOrder = async ({ userId, tableId, items, status, paymentStatus, hotelBookingId = null, roomNumber = null }) => {
   const table = await Table.findByPk(tableId);
   if (!table) {
     const error = new Error('Table not found.');
@@ -42,6 +42,8 @@ export const createOrder = async ({ userId, tableId, items, status, paymentStatu
       {
         userId: userId || null,
         tableId,
+        hotelBookingId,
+        roomNumber,
         totalPrice: subtotal,
         status: orderStatus,
         paymentStatus: orderPaymentStatus,
