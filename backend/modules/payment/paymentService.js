@@ -15,6 +15,19 @@ export const createPayment = async ({
     };
 };
 
+export const getPaymentMethods = async () => {
+    return {
+        success: true,
+        message: "Payment methods fetched successfully.",
+        data: [
+            { id: 1, name: "Cash" },
+            { id: 2, name: "Bank Transfer" },
+            { id: 3, name: "Credit Card" },
+        ],
+    };
+};
+
 export default {
     createPayment,
+    getPaymentMethods,
 };

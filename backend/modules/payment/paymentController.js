@@ -1,5 +1,5 @@
 import { validateCreatePayment } from "./paymentValidator.js";
-import { createPayment } from "./paymentService.js";
+import { createPayment, getPaymentMethods } from "./paymentService.js";
 
 export const create = async (req, res, next) => {
     try {
@@ -19,6 +19,17 @@ export const create = async (req, res, next) => {
     }
 };
 
+export const methods = async (req, res, next) => {
+    try {
+        const result = await getPaymentMethods();
+        return res.status(200).json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
 export default {
     create,
+    methods,
 };
