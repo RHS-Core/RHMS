@@ -14,6 +14,80 @@ const categoryMap = {
 
 const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=No+Image';
 
+// Dữ liệu món ăn mặc định khi database rỗng
+const defaultFoods = [
+  {
+    id: 1,
+    name: "Bò Bit-tết Sốt Vang Đỏ",
+    category: "MainCourse",
+    price: 350000,
+    status: "AVAILABLE",
+    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80",
+    description: "Thịt bò thăn nhập khẩu áp chảo kèm sốt vang đỏ Pháp đậm đà."
+  },
+  {
+    id: 2,
+    name: "Súp Hải Sản Bào Ngư",
+    category: "Appetizer",
+    price: 180000,
+    status: "AVAILABLE",
+    imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500&q=80",
+    description: "Súp thanh ngọt từ hải sản tươi sống và bào ngư thượng hạng."
+  },
+  {
+    id: 3,
+    name: "Cá Hồi Nướng Sốt Bơ Chanh",
+    category: "MainCourse",
+    price: 290000,
+    status: "AVAILABLE",
+    imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500&q=80",
+    description: "Cá hồi Nauy áp chảo xém cạnh, sốt bơ chanh thơm béo."
+  },
+  {
+    id: 4,
+    name: "Bánh Tiramisu Ý",
+    category: "Dessert",
+    price: 85000,
+    status: "AVAILABLE",
+    imageUrl: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500&q=80",
+    description: "Bánh Tiramisu truyền thống mềm mịn, đắng nhẹ vị cà phê."
+  },
+  {
+    id: 5,
+    name: "Cocktail Mojito Bạc Hà",
+    category: "Drink",
+    price: 65000,
+    status: "AVAILABLE",
+    imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80",
+    description: "Thức uống giải nhiệt mát lạnh kết hợp chanh tươi và bạc hà."
+  }
+];
+
+// Dữ liệu hình ảnh không gian phòng ăn / nhà hàng
+const diningRooms = [
+  {
+    id: 1,
+    title: "Phòng Ăn VIP - Sức chứa 12 khách",
+    type: "Phòng VIP",
+    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+    description: "Không gian riêng tư, ấm cúng thích hợp cho tiệc gia đình và gặp gỡ đối tác."
+  },
+  {
+    id: 2,
+    title: "Sảnh Chính Sang Trọng",
+    type: "Sảnh Chung",
+    imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&q=80",
+    description: "Thiết kế hiện đại với ánh đèn ấm áp, tầm nhìn thoáng đãng."
+  },
+  {
+    id: 3,
+    title: "Khu Vực Bàn Sân Thượng (Rooftop)",
+    type: "Ngoài Trời",
+    imageUrl: "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&q=80",
+    description: "Thưởng thức ẩm thực dưới ánh sao với không gian thoáng mát."
+  }
+];
+
 export default function MenuPage() {
   const { user } = useAuthContext();
   const [foods, setFoods] = useState([]);
@@ -60,9 +134,16 @@ export default function MenuPage() {
       setLoading(true);
       const response = await getFoods();
       const payload = response?.data?.data;
-      setFoods(payload?.items ?? payload ?? response?.data ?? []);
+      const apiData = payload?.items ?? payload ?? response?.data ?? [];
+
+      // Nếu có món từ Backend thì dùng, nếu rỗng thì lấy món mẫu chế sẵn
+      if (Array.isArray(apiData) && apiData.length > 0) {
+        setFoods(apiData);
+      } else {
+        setFoods(defaultFoods);
+      }
     } catch (error) {
-      setToast('Không thể tải thực đơn.');
+      setFoods(defaultFoods);
     } finally {
       setLoading(false);
     }
@@ -224,7 +305,7 @@ export default function MenuPage() {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredFoods.map((food) => (
               <div key={food.id} className="overflow-hidden rounded-xl border border-slate-200 shadow-sm transition hover:shadow-lg">
-                <div className="h-32 bg-slate-100">
+                <div className="h-44 bg-slate-100">
                   <img
                     src={food.imageUrl || DEFAULT_IMAGE}
                     alt={food.name}
@@ -235,11 +316,11 @@ export default function MenuPage() {
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold">{food.name}</h3>
-                      <p className="text-sm text-slate-500">{food.description || 'Món ăn đặc biệt'}</p>
+                      <h3 className="font-semibold text-slate-800">{food.name}</h3>
+                      <p className="mt-1 text-sm text-slate-500 line-clamp-2">{food.description || 'Món ăn đặc biệt'}</p>
                     </div>
                     <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                      className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
                         food.status === 'AVAILABLE'
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-rose-100 text-rose-700'
@@ -249,7 +330,7 @@ export default function MenuPage() {
                     </span>
                   </div>
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-lg font-semibold text-blue-700">
+                    <span className="text-lg font-bold text-blue-700">
                       {Number(food.price || 0).toLocaleString('vi-VN')}₫
                     </span>
                   </div>
@@ -300,6 +381,43 @@ export default function MenuPage() {
             ))}
           </div>
         )}
+
+        {/* Khung hiển thị Không gian & Phòng ăn */}
+        <div className="mt-12 border-t border-slate-200 pt-8">
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-slate-800">Không Gian & Phòng Ăn</h3>
+            <p className="text-sm text-slate-500">Khám phá các phòng ăn và sảnh tiệc sang trọng tại nhà hàng.</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {diningRooms.map((room) => (
+              <div 
+                key={room.id} 
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className="relative h-48 overflow-hidden bg-slate-100">
+                  <img
+                    src={room.imageUrl}
+                    alt={room.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <span className="absolute top-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                    {room.type}
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h4 className="text-lg font-bold text-slate-800 group-hover:text-blue-600">
+                    {room.title}
+                  </h4>
+                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">
+                    {room.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
 
       {/* Modal thêm/sửa món */}
@@ -308,7 +426,6 @@ export default function MenuPage() {
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
             <h3 className="mb-4 text-xl font-semibold">{editingId ? 'Chỉnh sửa món ăn' : 'Thêm món mới'}</h3>
             <form onSubmit={handleSaveFood} className="space-y-3">
-              {/* Image preview */}
               {imagePreview && (
                 <div className="flex justify-center">
                   <img src={imagePreview} alt="Preview" className="h-40 w-40 rounded-lg object-cover" />
