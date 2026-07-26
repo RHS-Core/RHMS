@@ -4,6 +4,8 @@ import cors from 'cors';
 import { connectDatabase } from './config/database.js';
 import restaurantRoutes from './modules/restaurant/restaurantRoutes.js';
 import paymentRoutes from './modules/payment/paymentRoutes.js';
+import hotelServiceRoutes from './modules/hotel-service/hotelServiceRoutes.js';
+
 import authRoutes from './routes/auth.routes.js';
 import foodRoutes from './routes/food.routes.js';
 import tableRoutes from './routes/table.routes.js';
@@ -31,8 +33,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/tables', tableRoutes);
 app.use('/api/orders', orderRoutes);
+
 app.use('/api', restaurantRoutes);
 app.use('/api', paymentRoutes);
+app.use('/api', hotelServiceRoutes);
 
 app.use(errorMiddleware);
 
