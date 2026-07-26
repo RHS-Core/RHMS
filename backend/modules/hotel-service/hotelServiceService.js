@@ -21,7 +21,22 @@ export const getServices = async () => {
         ],
     };
 };
+export const createService = async ({
+    name,
+    price,
+}) => {
+    return {
+        success: true,
+        message: "Hotel service created successfully.",
+        data: {
+            id: 4,
+            name,
+            price,
+        },
+    };
+};
 
 export default {
     getServices,
+    createService,
 };
