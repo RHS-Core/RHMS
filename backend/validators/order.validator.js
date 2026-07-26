@@ -37,6 +37,14 @@ export const createOrderSchema = Joi.object({
     'number.positive': 'Table ID must be greater than 0.',
     'any.required': 'Table ID is required.',
   }),
+  hotelBookingId: Joi.number().integer().positive().optional().messages({
+    'number.base': 'Hotel booking ID must be a number.',
+    'number.integer': 'Hotel booking ID must be an integer.',
+    'number.positive': 'Hotel booking ID must be greater than 0.',
+  }),
+  roomNumber: Joi.string().trim().max(50).optional().messages({
+    'string.max': 'Room number must not exceed 50 characters.',
+  }),
   items: Joi.array().items(itemSchema).min(1).required().messages({
     'array.min': 'At least one item is required.',
     'any.required': 'Items are required.',

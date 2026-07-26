@@ -1,97 +1,149 @@
 # RHMS
-# Thành viên nhóm gồm:
-- Phan Thị Ngân Quỳnh - MSSV: 24100457
-- Nghiêm Thị Mai Diễm - MSSV: 24107772
-- Đặng Ngọc Khuê - MSSV: 24100493
----
 
-# Restaurant & Hotel management system (RHMS) – Hệ thống quản lý Nhà hàng & Khách sạn
+Restaurant & Hotel Management System (RHMS) là hệ thống quản lý tích hợp cho nhà hàng và khách sạn, gồm xác thực người dùng, quản lý bàn ăn, menu, đơn hàng, thanh toán và nền tảng dữ liệu khách sạn.
 
-## Giới thiệu
+## Mô Hình Dự Án
 
-RHMS là hệ thống web hỗ trợ quản lý hoạt động nhà hàng và khách sạn một cách tích hợp.
-Hệ thống giúp tự động hóa quy trình vận hành, giảm sai sót và nâng cao hiệu quả làm việc.
+Backend được tổ chức theo luồng chuẩn:
 
----
+```mermaid
+flowchart LR
+	A[Routes] --> B[Middleware]
+	B --> C[Controller]
+	C --> D[Service]
+	D --> E[Model]
+	E --> F[(MySQL)]
+```
 
-## Mục tiêu
+Luồng nghiệp vụ chính:
 
-* Tự động hóa quy trình đặt bàn, đặt phòng, gọi món và thanh toán
-* Xây dựng cơ chế phân quyền rõ ràng giữa các nhóm người dùng
-* Hỗ trợ theo dõi và quản lý doanh thu
+```mermaid
+flowchart TD
+	U[User Login] --> R1[Restaurant APIs]
+	U --> H1[Hotel APIs]
+	R1 --> O[Order / Table / Food]
+	H1 --> B[Booking / Room]
+	O --> P[Payment]
+```
 
----
+## Cấu Trúc Thư Mục
 
-## Phân công công việc
+```text
+RHMS/
+├─ backend/
+│  ├─ config/            # Cấu hình DB
+│  ├─ controllers/       # Controller API
+│  ├─ middlewares/      # Auth, role, upload, error handler
+│  ├─ migrations/        # Migration MySQL
+│  ├─ models/            # Sequelize models
+│  ├─ modules/           # Module đặc thù (restaurant, payment)
+│  ├─ routes/            # REST routes chính
+│  ├─ scripts/           # migrate / seed helper
+│  ├─ services/          # Business logic
+│  ├─ src/seeds/seed.js  # Seed data mẫu
+│  └─ tests/             # Jest + Supertest
+├─ frontend/             # React + Vite UI
+└─ README.md
+```
 
-| Tên                 | Vai trò     | Phụ trách                          |
-| ------------------- | ----------- | ---------------------------------- |
-| Phan Thị Ngân Quỳnh | Nhóm trưởng | Module Nhà hàng + Xác thực (Auth)         |
-| Nghiêm Thị Mai Diễm                | Thành viên  | Module Khách sạn + Layout hệ thống |
-| Đặng Ngọc Khuê                | Thành viên  | Module Dịch vụ & Thanh toán        |
+## Cài Đặt
 
----
+### 1) Backend dependencies
 
-## Chức năng chính
+```bash
+cd backend
+npm install
+```
 
-**Nhà hàng**
+### 2) Tạo file `.env`
 
-* Xem menu
-* Đặt bàn
-* Gọi món
+Tạo `backend/.env` với nội dung tối thiểu:
 
-**Khách sạn**
+```env
+PORT=5000
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=webrhms
+DB_USER=root
+DB_PASSWORD=
+JWT_SECRET=webrhms_secret_key
+JWT_EXPIRES_IN=24h
+```
 
-* Đặt phòng
-* Check-in / Check-out
-* Quản lý trạng thái phòng
+## Lệnh Chạy Backend
 
-**Dịch vụ & Thanh toán**
+```bash
+cd backend
+npm run dev
+```
 
-* Room service
-* Mini bar
-* Thanh toán và hóa đơn
+## Lệnh Migrate
 
----
+```bash
+cd backend
+npm run migrate
+```
 
-## Phân quyền người dùng
+## Lệnh Seed Data
 
-* Khách hàng
-* Nhân viên
-* Quản lý
-* Tổng quản lý
+Script seed nằm tại `backend/src/seeds/seed.js` và có kiểm tra dữ liệu hiện có trước khi chèn.
 
----
+```bash
+cd backend
+npm run seed
+```
 
-## Công nghệ sử dụng
+Seed mẫu sẽ tạo:
 
-* Backend: NodeJS, Express
-* Frontend: React
+* 1 SuperAdmin
+* 1 HotelManager
+* 1 RestaurantManager
+* 2 Staff
+* 1 Customer
+* 5 món ăn
+* 5 bàn ăn
+* 5 phòng khách sạn
+
+## Lệnh Test
+
+```bash
+cd backend
+npm test
+```
+
+Jest được cấu hình cho dự án ESM và Supertest được dùng cho integration test của API.
+
+## Ghi Chú Kiến Trúc
+
+* API response chuẩn hóa theo dạng `success`, `message`, `data`.
+* Error response dùng dạng `success: false`, `message`, `errors: null`.
+* JWT dùng chung cho cả hai phân hệ Nhà hàng và Khách sạn.
+* Order có thể nhận thêm `hotelBookingId` và `roomNumber` để hỗ trợ đặt món về phòng.
+
+## Công Nghệ Sử Dụng
+
+* Backend: Node.js, Express, Sequelize
 * Database: MySQL
+* Test: Jest, Supertest
+* Frontend: React, Vite, Tailwind CSS
 
----
+## Thành Viên Nhóm
 
-## Kiến trúc hệ thống
+| Tên | MSSV | Vai trò |
+| --- | --- | --- |
+| Phan Thị Ngân Quỳnh | 24100457 | Nhóm trưởng |
+| Nghiêm Thị Mai Diễm | 24107772 | Thành viên |
+| Đặng Ngọc Khuê | 24100493 | Thành viên |
 
-```id="8ojl2a"
-Frontend → Backend API → Database → Backend → Frontend
-```
-
-Backend:
-
-```id="o9j7fp"
-Routes → Middleware → Controller → Service → Model → Database
-```
-
-# Git Workflow
+## Git Workflow
 
 * `main`: phiên bản ổn định
 * `dev`: nhánh phát triển chính
-* `feature/*`: nhánh phát triển tính năng
+* `feature/*`: nhánh tính năng
 
-**Ví dụ:**
+Ví dụ:
 
-```
+```text
 feature/restaurant-auth-quynh
 feature/hotel-booking-diem
 feature/payment-khue

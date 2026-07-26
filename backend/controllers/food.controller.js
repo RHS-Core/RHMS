@@ -6,15 +6,12 @@ import {
   updateFood,
   deleteFood,
 } from '../services/food.service.js';
+import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 export const listFoods = async (req, res, next) => {
   try {
     const result = await getAllFoods(req.query);
-    return res.status(200).json({
-      success: true,
-      message: 'Foods fetched successfully',
-      data: result,
-    });
+    return successResponse(res, 200, 'Foods fetched successfully', result);
   } catch (error) {
     return next(error);
   }
@@ -23,11 +20,7 @@ export const listFoods = async (req, res, next) => {
 export const getFood = async (req, res, next) => {
   try {
     const food = await getFoodById(req.params.id);
-    return res.status(200).json({
-      success: true,
-      message: 'Food fetched successfully',
-      data: food,
-    });
+    return successResponse(res, 200, 'Food fetched successfully', food);
   } catch (error) {
     return next(error);
   }
@@ -38,21 +31,13 @@ export const createFoodHandler = async (req, res, next) => {
     const { error, value } = createFoodSchema.validate(req.body, { abortEarly: false });
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((detail) => detail.message),
-      });
+      return errorResponse(res, 400, 'Validation failed');
     }
 
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
     const food = await createFood(value, imagePath);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Food created successfully',
-      data: food,
-    });
+    return successResponse(res, 201, 'Food created successfully', food);
   } catch (error) {
     return next(error);
   }
@@ -63,21 +48,13 @@ export const updateFoodHandler = async (req, res, next) => {
     const { error, value } = updateFoodSchema.validate(req.body, { abortEarly: false });
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((detail) => detail.message),
-      });
+      return errorResponse(res, 400, 'Validation failed');
     }
 
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
     const food = await updateFood(req.params.id, value, imagePath);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Food updated successfully',
-      data: food,
-    });
+    return successResponse(res, 200, 'Food updated successfully', food);
   } catch (error) {
     return next(error);
   }
@@ -86,11 +63,7 @@ export const updateFoodHandler = async (req, res, next) => {
 export const deleteFoodHandler = async (req, res, next) => {
   try {
     await deleteFood(req.params.id);
-    return res.status(200).json({
-      success: true,
-      message: 'Food deleted successfully',
-      data: {},
-    });
+    return successResponse(res, 200, 'Food deleted successfully', {});
   } catch (error) {
     return next(error);
   }

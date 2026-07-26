@@ -4,12 +4,14 @@ import defineFoodModel from './Food.js';
 import defineTableModel from './Table.js';
 import defineOrderModel from './Order.js';
 import defineOrderItemModel from './OrderItem.js';
+import defineRoomModel from './Room.js';
 
 const User = defineUserModel(sequelize);
 const Food = defineFoodModel(sequelize);
 const Table = defineTableModel(sequelize);
 const Order = defineOrderModel(sequelize);
 const OrderItem = defineOrderItemModel(sequelize);
+const Room = defineRoomModel(sequelize);
 
 // User └──< Order
 User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
@@ -27,4 +29,5 @@ Food.hasMany(OrderItem, { foreignKey: 'foodId', as: 'orderItems' });
 OrderItem.belongsTo(Food, { foreignKey: 'foodId', as: 'food' });
 
 export { sequelize, User, Food, Table, Order, OrderItem };
-export default { sequelize, User, Food, Table, Order, OrderItem };
+export { Room };
+export default { sequelize, User, Food, Table, Order, OrderItem, Room };

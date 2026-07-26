@@ -13,14 +13,11 @@ import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const app = express();
 
-// Middlewares cơ bản
 app.use(cors());
 app.use(express.json());
 
-// Serving static files 
 app.use('/uploads', express.static('uploads'));
 
-// Health check route
 app.get('/api/ping', (req, res) => {
   res.json({
     success: true,
@@ -29,7 +26,6 @@ app.get('/api/ping', (req, res) => {
   });
 });
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/foods', foodRoutes);
@@ -38,7 +34,6 @@ app.use('/api/orders', orderRoutes);
 app.use('/api', restaurantRoutes);
 app.use('/api', paymentRoutes);
 
-// Error handling middleware 
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
@@ -46,9 +41,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDatabase();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+    app.listen(PORT);
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

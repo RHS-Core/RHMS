@@ -1,20 +1,18 @@
 import { Router } from "express";
-import { create, methods, getAll  } from "./paymentController.js";
+import { successResponse } from "../../utils/apiResponse.js";
+import { create, methods, getAll } from "./paymentController.js";
 
 const router = Router();
+
 router.get("/payment/health", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Payment module is healthy",
-        data: {
-            module: "payment",
-            status: "ok",
-        },
+    return successResponse(res, 200, "Payment module is healthy", {
+        module: "payment",
+        status: "ok",
     });
 });
 
 router.get("/payment/methods", methods);
-router.post("/payment", create);
 router.get("/payment", getAll);
+router.post("/payment", create);
 
 export default router;

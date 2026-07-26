@@ -1,13 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { Sequelize } from 'sequelize';
 import 'dotenv/config';
 import sequelize from '../config/database.js';
-import { DataTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 
 const run = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connected to database.');
 
     const [results] = await sequelize.query(`
       SELECT COUNT(*) AS count FROM information_schema.columns
@@ -30,12 +28,11 @@ const run = async () => {
       'SELECT * FROM users WHERE username = :username OR email = :email',
       {
         replacements: { username, email },
-        type: Sequelize.QueryTypes.SELECT,
+        type: QueryTypes.SELECT,
       }
     );
 
     if (users) {
-      console.log('SuperAdmin user already exists.');
       process.exit(0);
     }
 
@@ -52,9 +49,6 @@ const run = async () => {
         },
       }
     );
-
-    console.log('SuperAdmin account created successfully.');
-    console.log('Login with username: superadmin and password: Admin123');
   } catch (error) {
     console.error('Failed to seed SuperAdmin:', error);
     process.exitCode = 1;

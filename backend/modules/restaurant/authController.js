@@ -1,50 +1,43 @@
 import { validateLoginInput, validateRegisterInput } from './authValidator.js';
 import { register as registerUser, login as loginUser, getCurrentUser } from './authService.js';
+import { successResponse, errorResponse } from '../../utils/apiResponse.js';
 
 export const register = async (req, res, next) => {
   try {
-    const { isValid, errors } = validateRegisterInput(req.body);
+    const { isValid } = validateRegisterInput(req.body);
 
     if (!isValid) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed.',
-        errors,
-      });
+      return errorResponse(res, 400, 'Validation failed.');
     }
 
     const result = await registerUser(req.body);
-    return res.status(201).json(result);
+    return successResponse(res, 201, result.message, result.data);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 export const login = async (req, res, next) => {
   try {
-    const { isValid, errors } = validateLoginInput(req.body);
+    const { isValid } = validateLoginInput(req.body);
 
     if (!isValid) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed.',
-        errors,
-      });
+      return errorResponse(res, 400, 'Validation failed.');
     }
 
     const result = await loginUser(req.body);
-    return res.status(200).json(result);
+    return successResponse(res, 200, result.message, result.data);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 export const me = async (req, res, next) => {
   try {
     const result = await getCurrentUser(req.user.id);
-    return res.status(200).json(result);
+    return successResponse(res, 200, result.message, result.data);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

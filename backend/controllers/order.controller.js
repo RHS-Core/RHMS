@@ -10,16 +10,13 @@ import {
   updateOrderItems,
   updateOrderStatus,
 } from '../services/order.service.js';
+import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 export const createOrderHandler = async (req, res, next) => {
   try {
     const { error, value } = createOrderSchema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((detail) => detail.message),
-      });
+      return errorResponse(res, 400, 'Validation failed');
     }
 
     const order = await createOrder({
@@ -28,13 +25,11 @@ export const createOrderHandler = async (req, res, next) => {
       items: value.items,
       status: value.status || 'PENDING',
       paymentStatus: value.paymentStatus,
+      hotelBookingId: value.hotelBookingId,
+      roomNumber: value.roomNumber,
     });
 
-    return res.status(201).json({
-      success: true,
-      message: 'Order created successfully',
-      data: order,
-    });
+    return successResponse(res, 201, 'Order created successfully', order);
   } catch (error) {
     return next(error);
   }
@@ -43,11 +38,7 @@ export const createOrderHandler = async (req, res, next) => {
 export const listOrders = async (req, res, next) => {
   try {
     const result = await getAllOrders(req.query);
-    return res.status(200).json({
-      success: true,
-      message: 'Orders fetched successfully',
-      data: result,
-    });
+    return successResponse(res, 200, 'Orders fetched successfully', result);
   } catch (error) {
     return next(error);
   }
@@ -56,11 +47,7 @@ export const listOrders = async (req, res, next) => {
 export const getOrderHandler = async (req, res, next) => {
   try {
     const order = await getOrderById(req.params.id);
-    return res.status(200).json({
-      success: true,
-      message: 'Order fetched successfully',
-      data: order,
-    });
+    return successResponse(res, 200, 'Order fetched successfully', order);
   } catch (error) {
     return next(error);
   }
@@ -70,19 +57,11 @@ export const updateOrderStatusHandler = async (req, res, next) => {
   try {
     const { error, value } = updateOrderStatusSchema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((detail) => detail.message),
-      });
+      return errorResponse(res, 400, 'Validation failed');
     }
 
     const order = await updateOrderStatus(req.params.id, value.status);
-    return res.status(200).json({
-      success: true,
-      message: 'Order status updated successfully',
-      data: order,
-    });
+    return successResponse(res, 200, 'Order status updated successfully', order);
   } catch (error) {
     return next(error);
   }
@@ -92,19 +71,11 @@ export const updateOrderItemsHandler = async (req, res, next) => {
   try {
     const { error, value } = updateOrderItemsSchema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((detail) => detail.message),
-      });
+      return errorResponse(res, 400, 'Validation failed');
     }
 
     const order = await updateOrderItems(req.params.id, value.items);
-    return res.status(200).json({
-      success: true,
-      message: 'Order items updated successfully',
-      data: order,
-    });
+    return successResponse(res, 200, 'Order items updated successfully', order);
   } catch (error) {
     return next(error);
   }
