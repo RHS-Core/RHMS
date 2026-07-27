@@ -93,11 +93,34 @@ export const getStaffRevenue = async (staffId) => {
         },
     };
 };
+export const getManagerRevenue = async () => {
+    const result = await getPayments();
+
+    const paidPayments = result.data.filter(
+        (payment) => payment.status === "Paid"
+    );
+
+    const totalRevenue = paidPayments.reduce(
+        (sum, payment) => sum + payment.amount,
+        0
+    );
+
+    return {
+        success: true,
+        message: "Manager revenue fetched successfully.",
+        data: {
+            totalRevenue,
+            totalPayments: paidPayments.length,
+        },
+    };
+};
 
 export default {
     createPayment,
     getPaymentMethods,
     getPayments,
     updatePaymentStatus,
-    getStaffRevenue
+    getStaffRevenue,
+    getManagerRevenue,
+
 };
