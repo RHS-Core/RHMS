@@ -46,9 +46,21 @@ export const getServiceById = async (id) => {
         },
     };
 };
+export const updateService = async (id, { name, price }) => {
+    return {
+        success: true,
+        message: "Hotel service updated successfully.",
+        data: {
+            id,
+            name,
+            price,
+        },
+    };
+};
 
 export default {
     getServices,
     createService,
     getServiceById,
+    updateService,
 };
