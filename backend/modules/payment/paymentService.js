@@ -49,9 +49,21 @@ export const getPayments = async () => {
         ],
     };
 };
+export const updatePaymentStatus = async (id, status) => {
+    return {
+        success: true,
+        message: "Payment status updated successfully.",
+        data: {
+            id,
+            status,
+        },
+    };
+};
 
 export default {
     createPayment,
     getPaymentMethods,
     getPayments,
+    updatePaymentStatus,
+
 };
