@@ -1,7 +1,15 @@
 import { Router } from "express";
 import { successResponse } from "../../utils/apiResponse.js";
-import { create, methods, getAll, updateStatus, staffRevenue, managerRevenue, adminRevenue} from "./paymentController.js";
-
+import {
+    create,
+    methods,
+    getAll,
+    updateStatus,
+    staffRevenue,
+    hotelManagerRevenue,
+    restaurantManagerRevenue,
+    adminRevenue,
+} from "./paymentController.js";
 const router = Router();
 
 router.get("/payment/health", (req, res) => {
@@ -16,7 +24,8 @@ router.get("/payment/methods", methods);
 router.get("/payment", getAll);
 router.patch("/payment/:id/status", updateStatus);
 router.get("/payment/revenue/staff/:staffId", staffRevenue);
-router.get("/payment/revenue/manager", managerRevenue);
+router.get("/payment/revenue/hotel-manager", hotelManagerRevenue);
+router.get("/payment/revenue/restaurant-manager", restaurantManagerRevenue);
 router.get("/payment/revenue/admin", adminRevenue);
 
 export default router;

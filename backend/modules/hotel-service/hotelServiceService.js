@@ -5,18 +5,27 @@ export const getServices = async () => {
         data: [
             {
                 id: 1,
-                name: "Laundry",
-                price: 50000,
+                name: "Breakfast",
+                type: "hotel",
+                price: 100000,
             },
             {
                 id: 2,
-                name: "Breakfast",
-                price: 120000,
+                name: "Mini Bar",
+                type: "hotel",
+                price: 200000,
             },
             {
                 id: 3,
-                name: "Spa",
-                price: 300000,
+                name: "Laundry",
+                type: "hotel",
+                price: 50000,
+            },
+            {
+                id: 4,
+                name: "Restaurant Order",
+                type: "restaurant",
+                price: 350000,
             },
         ],
     };
