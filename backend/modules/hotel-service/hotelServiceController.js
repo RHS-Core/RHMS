@@ -1,4 +1,4 @@
-import { getServices, createService } from "./hotelServiceService.js";
+import { getServices, createService, getServiceById} from "./hotelServiceService.js";
 import { validateCreateService } from "./hotelServiceValidator.js";
 
 export const getAll = async (req, res, next) => {
@@ -25,8 +25,20 @@ export const create = async (req, res, next) => {
         next(error);
     }
 };
+export const getById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const result = await getServiceById(id);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
 
 export default {
     getAll,
     create,
+    getById,
 };

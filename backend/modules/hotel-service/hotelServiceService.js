@@ -35,8 +35,20 @@ export const createService = async ({
         },
     };
 };
+export const getServiceById = async (id) => {
+    return {
+        success: true,
+        message: "Hotel service fetched successfully.",
+        data: {
+            id,
+            name: "Laundry",
+            price: 50000,
+        },
+    };
+};
 
 export default {
     getServices,
     createService,
+    getServiceById,
 };
