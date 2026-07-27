@@ -1,5 +1,5 @@
 import { validateCreatePayment } from "./paymentValidator.js";
-import { createPayment, getPaymentMethods } from "./paymentService.js";
+import { createPayment, getPaymentMethods, getPayments, updatePaymentStatus, getStaffRevenue, getManagerRevenue, getAdminRevenue} from "./paymentService.js";
 
 export const create = async (req, res, next) => {
     try {
@@ -29,7 +29,60 @@ export const methods = async (req, res, next) => {
     }
 };
 
+export const getAll = async (req, res, next) => {
+    try {
+        const result = await getPayments();
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+export const updateStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const result = await updatePaymentStatus(id, status);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+export const staffRevenue = async (req, res, next) => {
+    try {
+        const { staffId } = req.params;
+
+        const result = await getStaffRevenue(staffId);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+export const managerRevenue = async (req, res, next) => {
+    try {
+        const result = await getManagerRevenue();
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+export const adminRevenue = async (req, res, next) => {
+    try {
+        const result = await getAdminRevenue();
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
     create,
     methods,
+    getAll,
+    updateStatus,
+    staffRevenue,
+    managerRevenue,
+    adminRevenue,
 };
