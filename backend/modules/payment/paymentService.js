@@ -35,6 +35,7 @@ export const getPayments = async () => {
             {
                 id: 1,
                 bookingId: 101,
+                staffId: 1,
                 amount: 500000,
                 paymentMethod: "Cash",
                 status: "Paid",
@@ -42,9 +43,18 @@ export const getPayments = async () => {
             {
                 id: 2,
                 bookingId: 102,
+                staffId: 2,
                 amount: 1200000,
                 paymentMethod: "Bank Transfer",
                 status: "Pending",
+            },
+            {
+                id: 3,
+                bookingId: 103,
+                staffId: 1,
+                amount: 800000,
+                paymentMethod: "Cash",
+                status: "Paid",
             },
         ],
     };
@@ -59,11 +69,35 @@ export const updatePaymentStatus = async (id, status) => {
         },
     };
 };
+export const getStaffRevenue = async (staffId) => {
+    const result = await getPayments();
+
+    const paidPayments = result.data.filter(
+        (payment) =>
+            payment.staffId == staffId &&
+            payment.status === "Paid"
+    );
+
+    const totalRevenue = paidPayments.reduce(
+        (sum, payment) => sum + payment.amount,
+        0
+    );
+
+    return {
+        success: true,
+        message: "Staff revenue fetched successfully.",
+        data: {
+            staffId,
+            totalRevenue,
+            totalPayments: paidPayments.length,
+        },
+    };
+};
 
 export default {
     createPayment,
     getPaymentMethods,
     getPayments,
     updatePaymentStatus,
-
+    getStaffRevenue
 };

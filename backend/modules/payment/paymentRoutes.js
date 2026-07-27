@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { successResponse } from "../../utils/apiResponse.js";
-import { create, methods, getAll, updateStatus, } from "./paymentController.js";
+import { create, methods, getAll, updateStatus, staffRevenue} from "./paymentController.js";
 
 const router = Router();
 
@@ -15,5 +15,6 @@ router.post("/payment", create);
 router.get("/payment/methods", methods);
 router.get("/payment", getAll);
 router.patch("/payment/:id/status", updateStatus);
+router.get("/payment/revenue/staff/:staffId", staffRevenue);
 
 export default router;
