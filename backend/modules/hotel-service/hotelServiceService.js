@@ -57,10 +57,20 @@ export const updateService = async (id, { name, price }) => {
         },
     };
 };
+export const deleteService = async (id) => {
+    return {
+        success: true,
+        message: "Hotel service deleted successfully.",
+        data: {
+            id,
+        },
+    };
+};
 
 export default {
     getServices,
     createService,
     getServiceById,
     updateService,
+    deleteService,
 };
