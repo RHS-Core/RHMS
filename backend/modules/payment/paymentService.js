@@ -114,6 +114,20 @@ export const getManagerRevenue = async () => {
         },
     };
 };
+export const getAdminRevenue = async () => {
+    const restaurantRevenue = 2500000;
+    const hotelRevenue = 1800000;
+
+    return {
+        success: true,
+        message: "Admin revenue fetched successfully.",
+        data: {
+            restaurantRevenue,
+            hotelRevenue,
+            totalRevenue: restaurantRevenue + hotelRevenue,
+        },
+    };
+};
 
 export default {
     createPayment,
@@ -122,5 +136,6 @@ export default {
     updatePaymentStatus,
     getStaffRevenue,
     getManagerRevenue,
+    getAdminRevenue,
 
 };
