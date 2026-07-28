@@ -1,6 +1,14 @@
 import { validateCreatePayment } from "./paymentValidator.js";
-import { createPayment, getPaymentMethods, getPayments, updatePaymentStatus, getStaffRevenue, getManagerRevenue, getAdminRevenue} from "./paymentService.js";
-
+import {
+    createPayment,
+    getPaymentMethods,
+    getPayments,
+    updatePaymentStatus,
+    getStaffRevenue,
+    getHotelManagerRevenue,
+    getRestaurantManagerRevenue,
+    getAdminRevenue,
+} from "./paymentService.js";
 export const create = async (req, res, next) => {
     try {
         const { isValid, errors } = validateCreatePayment(req.body);
@@ -60,9 +68,18 @@ export const staffRevenue = async (req, res, next) => {
         next(error);
     }
 };
-export const managerRevenue = async (req, res, next) => {
+export const hotelManagerRevenue = async (req, res, next) => {
     try {
-        const result = await getManagerRevenue();
+        const result = await getHotelManagerRevenue();
+        return res.status(200).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const restaurantManagerRevenue = async (req, res, next) => {
+    try {
+        const result = await getRestaurantManagerRevenue();
         return res.status(200).json(result);
     } catch (error) {
         next(error);
@@ -83,6 +100,7 @@ export default {
     getAll,
     updateStatus,
     staffRevenue,
-    managerRevenue,
+    hotelManagerRevenue,
+    restaurantManagerRevenue,
     adminRevenue,
 };
