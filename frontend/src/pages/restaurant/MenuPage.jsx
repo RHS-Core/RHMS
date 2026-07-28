@@ -1,516 +1,275 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/AuthContext.jsx';
-import { createFood, getFoods, deleteFood, updateFood } from '../../services/foodService.js';
+import React, { useState } from 'react';
 
-const categories = ['All', 'Khai vị', 'Món chính', 'Tráng miệng', 'Đồ uống'];
-const categoryMap = {
-  All: 'All',
-  'Khai vị': 'Appetizer',
-  'Món chính': 'MainCourse',
-  'Tráng miệng': 'Dessert',
-  'Đồ uống': 'Drink',
-};
+const RestaurantMenu = () => {
+  
+  const [menuItems, setMenuItems] = useState([
+    // Khai vị
+    {
+      id: 1,
+      name: 'Súp Hải Sản Bào Ngư',
+      category: 'Khai vị',
+      price: 180000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80',
+      description: 'Súp thanh ngọt từ hải sản tươi sống và bào ngư thượng hạng.'
+    },
+    {
+      id: 2,
+      name: 'Salad Caesar Thịt Xông Khói',
+      category: 'Khai vị',
+      price: 95000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?auto=format&fit=crop&w=600&q=80',
+      description: 'Rau xà lách giòn mát, bánh mì nướng giòn và sốt Caesar đặc biệt.'
+    },
+    {
+      id: 3,
+      name: 'Chả Giò Hải Sản Sốt Mayonnaise',
+      category: 'Khai vị',
+      price: 85000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&w=600&q=80',
+      description: 'Vỏ giòn rụm nhân tôm thịt đậm đà chấm kèm sốt béo ngậy.'
+    },
 
-const DEFAULT_IMAGE = 'https://via.placeholder.com/300x200?text=No+Image';
+    // Món chính (Có Phở, Bún bò, Pizza, Bò bít tết...)
+    {
+      id: 4,
+      name: 'Phở Bò Tái Nạm Truyền Thống',
+      category: 'Món chính',
+      price: 75000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80',
+      description: 'Nước dùng hầm xương ngọt thanh, bánh phở mềm và thịt bò tươi.'
+    },
+    {
+      id: 5,
+      name: 'Bún Bò Huế Đặc Biệt',
+      category: 'Món chính',
+      price: 85000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80',
+      description: 'Hương vị sả ớt đậm đà kèm giò heo, chả cua và thịt bò mềm.'
+    },
+    {
+      id: 6,
+      name: 'Pizza Hải Sản Phô Mai (Size L)',
+      category: 'Món chính',
+      price: 220000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80',
+      description: 'Đế bánh giòn xốp ngập tràn tôm mực và lớp phô mai kéo sợi thơm phức.'
+    },
+    {
+      id: 7,
+      name: 'Bò Bit-tết Sốt Vang Đỏ',
+      category: 'Món chính',
+      price: 350000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+      description: 'Thịt bò thăn nhập khẩu áp chảo kèm sốt vang đỏ Pháp đậm đà.'
+    },
+    {
+      id: 8,
+      name: 'Cá Hồi Nướng Sốt Bơ Chanh',
+      category: 'Món chính',
+      price: 290000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80',
+      description: 'Cá hồi Nauy áp chảo xém cạnh, sốt bơ chanh thơm béo.'
+    },
+    {
+      id: 9,
+      name: 'Mì Cay Hải Sản 7 Cấp Độ',
+      category: 'Món chính',
+      price: 95000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1612927601601-6638404738cbb?auto=format&fit=crop&w=600&q=80',
+      description: 'Mì Hàn Quốc cay nồng chuẩn vị kèm tôm, mực, bò và nấm kim châm.'
+    },
+    {
+      id: 10,
+      name: 'Mì Ý Sốt Kem Hải Sản',
+      category: 'Món chính',
+      price: 160000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281298?auto=format&fit=crop&w=600&q=80',
+      description: 'Mì Ý sợi dai quyện cùng sốt kem ngậy và tôm mực tươi ngon.'
+    },
+    {
+      id: 11,
+      name: 'Gà Rán Sốt Cay Hàn Quốc',
+      category: 'Món chính',
+      price: 140000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
+      description: 'Đùi gà giòn rụm áo sốt cay ngọt chuẩn vị Hàn Quốc.'
+    },
 
-// Dữ liệu món ăn mặc định khi database rỗng
-const defaultFoods = [
-  {
-    id: 1,
-    name: "Bò Bit-tết Sốt Vang Đỏ",
-    category: "MainCourse",
-    price: 350000,
-    status: "AVAILABLE",
-    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80",
-    description: "Thịt bò thăn nhập khẩu áp chảo kèm sốt vang đỏ Pháp đậm đà."
-  },
-  {
-    id: 2,
-    name: "Súp Hải Sản Bào Ngư",
-    category: "Appetizer",
-    price: 180000,
-    status: "AVAILABLE",
-    imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=500&q=80",
-    description: "Súp thanh ngọt từ hải sản tươi sống và bào ngư thượng hạng."
-  },
-  {
-    id: 3,
-    name: "Cá Hồi Nướng Sốt Bơ Chanh",
-    category: "MainCourse",
-    price: 290000,
-    status: "AVAILABLE",
-    imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500&q=80",
-    description: "Cá hồi Nauy áp chảo xém cạnh, sốt bơ chanh thơm béo."
-  },
-  {
-    id: 4,
-    name: "Bánh Tiramisu Ý",
-    category: "Dessert",
-    price: 85000,
-    status: "AVAILABLE",
-    imageUrl: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=500&q=80",
-    description: "Bánh Tiramisu truyền thống mềm mịn, đắng nhẹ vị cà phê."
-  },
-  {
-    id: 5,
-    name: "Cocktail Mojito Bạc Hà",
-    category: "Drink",
-    price: 65000,
-    status: "AVAILABLE",
-    imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80",
-    description: "Thức uống giải nhiệt mát lạnh kết hợp chanh tươi và bạc hà."
-  }
-];
+    // Tráng miệng
+    {
+      id: 12,
+      name: 'Bánh Tiramisu Ý',
+      category: 'Tráng miệng',
+      price: 85000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80',
+      description: 'Bánh Tiramisu truyền thống mềm mịn, đắng nhẹ vị cà phê.'
+    },
+    {
+      id: 13,
+      name: 'Chè Khúc Bạch Hạt Chia',
+      category: 'Tráng miệng',
+      price: 45000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=600&q=80',
+      description: 'Thanh mát, ngọt dịu kết hợp hạnh nhân và nhãn lồng.'
+    },
+    {
+      id: 14,
+      name: 'Kem Vanilla Phủ Sốt Chocolate',
+      category: 'Tráng miệng',
+      price: 40000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80',
+      description: 'Kem tươi mát lạnh tan chảy cùng sốt chocolate đậm đà.'
+    },
 
-// Dữ liệu hình ảnh không gian phòng ăn / nhà hàng
-const diningRooms = [
-  {
-    id: 1,
-    title: "Phòng Ăn VIP - Sức chứa 12 khách",
-    type: "Phòng VIP",
-    imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
-    description: "Không gian riêng tư, ấm cúng thích hợp cho tiệc gia đình và gặp gỡ đối tác."
-  },
-  {
-    id: 2,
-    title: "Sảnh Chính Sang Trọng",
-    type: "Sảnh Chung",
-    imageUrl: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=800&q=80",
-    description: "Thiết kế hiện đại với ánh đèn ấm áp, tầm nhìn thoáng đãng."
-  },
-  {
-    id: 3,
-    title: "Khu Vực Bàn Sân Thượng (Rooftop)",
-    type: "Ngoài Trời",
-    imageUrl: "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&q=80",
-    description: "Thưởng thức ẩm thực dưới ánh sao với không gian thoáng mát."
-  }
-];
-
-export default function MenuPage() {
-  const { user } = useAuthContext();
-  const [foods, setFoods] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [search, setSearch] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
-  const [imagePreview, setImagePreview] = useState('');
-  const [toast, setToast] = useState('');
-  const [imageFile, setImageFile] = useState(null);
-
-  const navigate = useNavigate();
-  const canManage = ['RestaurantManager', 'SuperAdmin'].includes(user?.role);
-  const isCustomer = user?.role === 'Customer';
-
-  const addToCart = (food) => {
-    const existingCart = JSON.parse(localStorage.getItem('restaurantCart') || '[]');
-    const nextCart = [...existingCart];
-    const existingItem = nextCart.find((item) => item.foodId === food.id);
-
-    if (existingItem) {
-      existingItem.qty += 1;
-    } else {
-      nextCart.push({ foodId: food.id, name: food.name, price: Number(food.price || 0), qty: 1 });
+    // Đồ uống
+    {
+      id: 15,
+      name: 'Cocktail Mojito Bạc Hà',
+      category: 'Đồ uống',
+      price: 65000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
+      description: 'Thức uống giải nhiệt mát lạnh kết hợp chanh tươi và bạc hà.'
+    },
+    {
+      id: 16,
+      name: 'Trà Sữa Trân Châu Đường Đen',
+      category: 'Đồ uống',
+      price: 55000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1558857563-b371032b853e?auto=format&fit=crop&w=600&q=80',
+      description: 'Trà sữa thơm béo kèm trân châu dẻo dai đượm vị đường đen.'
+    },
+    {
+      id: 17,
+      name: 'Nước Ép Cam Tươi Nguyên Chất',
+      category: 'Đồ uống',
+      price: 55000,
+      status: 'AVAILABLE',
+      image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80',
+      description: 'Cam tươi vắt nguyên chất giàu vitamin C giải khát tức thì.'
     }
+  ]);
 
-    localStorage.setItem('restaurantCart', JSON.stringify(nextCart));
-    setToast('✓ Thêm vào đơn hàng thành công!');
-    setTimeout(() => setToast(''), 2000);
-  };
+  // Bộ lọc danh mục và tìm kiếm
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const createOrder = (food) => {
-    const cartItem = { foodId: food.id, name: food.name, price: Number(food.price || 0), qty: 1 };
-    localStorage.setItem('restaurantCart', JSON.stringify([cartItem]));
-    navigate('/restaurant/orders');
-  };
+  // Lọc danh sách món ăn
+  const filteredItems = menuItems.filter(item => {
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const loadFoods = async () => {
-    try {
-      setLoading(true);
-      const response = await getFoods();
-      const payload = response?.data?.data;
-      const apiData = payload?.items ?? payload ?? response?.data ?? [];
-
-      // Nếu có món từ Backend thì dùng, nếu rỗng thì lấy món mẫu chế sẵn
-      if (Array.isArray(apiData) && apiData.length > 0) {
-        setFoods(apiData);
-      } else {
-        setFoods(defaultFoods);
-      }
-    } catch (error) {
-      setFoods(defaultFoods);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadFoods();
-  }, []);
-
-  const filteredFoods = useMemo(() => {
-    const term = search.toLowerCase();
-    return [...foods]
-      .filter((item) => {
-        const matchCategory = activeCategory === 'All' || item.category === categoryMap[activeCategory];
-        const matchSearch = !term || item.name?.toLowerCase().includes(term);
-        const matchStatus = statusFilter === 'All' || item.status === statusFilter;
-        return matchCategory && matchSearch && matchStatus;
-      })
-      .sort((a, b) => {
-        const priceA = Number(a.price || 0);
-        const priceB = Number(b.price || 0);
-        return sortOrder === 'asc' ? priceA - priceB : priceB - priceA;
-      });
-  }, [foods, activeCategory, search, sortOrder, statusFilter]);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result);
-        setForm({ ...form, imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleImageUrlChange = (value) => {
-    setForm({ ...form, imageUrl: value });
-    setImagePreview(value || DEFAULT_IMAGE);
-  };
-
-  const openModal = (food = null) => {
-    if (food) {
-      setEditingId(food.id);
-      setForm({ name: food.name, category: food.category, price: food.price, imageUrl: food.imageUrl || '', description: food.description || '' });
-      setImagePreview(food.imageUrl || DEFAULT_IMAGE);
-    } else {
-      setEditingId(null);
-      setForm({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
-      setImagePreview(DEFAULT_IMAGE);
-    }
-    setImageFile(null);
-    setShowModal(true);
-  };
-
-  const handleSaveFood = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.price) {
-      setToast('Vui lòng nhập tên và giá tiền.');
-      return;
-    }
-
-    try {
-      const payload = {
-        name: form.name,
-        category: form.category,
-        price: Number(form.price),
-        imageUrl: form.imageUrl,
-        description: form.description,
-      };
-
-      if (editingId) {
-        await updateFood(editingId, payload);
-        setToast('Cập nhật món ăn thành công!');
-      } else {
-        await createFood(payload);
-        setToast('Thêm món mới thành công!');
-      }
-
-      setShowModal(false);
-      setForm({ name: '', category: 'Appetizer', price: '', imageUrl: '', description: '' });
-      setImagePreview('');
-      loadFoods();
-    } catch (error) {
-      setToast(editingId ? 'Cập nhật thất bại.' : 'Thêm món thất bại.');
-    }
-  };
-
-  const handleDeleteFood = async (id) => {
-    if (!window.confirm('Bạn chắc chắn muốn xóa món ăn này?')) return;
-    try {
-      await deleteFood(id);
-      setToast('Xóa món ăn thành công!');
-      loadFoods();
-    } catch (error) {
-      setToast('Xóa thất bại.');
-    }
+  const handleOrder = (itemName) => {
+    alert(`Đã tạo đơn gọi món "${itemName}" tại bàn thành công!`);
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
-      <div className="mx-auto max-w-7xl rounded-2xl bg-white p-6 shadow">
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold">Quản lý Thực đơn</h2>
-            <p className="text-sm text-slate-500">Tìm món, sắp xếp và quản lý menu nhà hàng.</p>
-          </div>
-          {canManage && (
-            <button onClick={() => openModal()} className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700">
-              + Thêm món mới
-            </button>
-          )}
-        </div>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Tiêu đề */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Quản lý Thực đơn</h2>
+        <p className="text-sm text-gray-500">Tìm món, sắp xếp và quản lý menu nhà hàng.</p>
+      </div>
 
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm kiếm món ăn..."
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 md:max-w-sm"
-          />
-          <div className="flex gap-2">
-            <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2">
-              <option value="asc">Giá tăng dần</option>
-              <option value="desc">Giá giảm dần</option>
-            </select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2">
-              <option value="All">Tất cả trạng thái</option>
-              <option value="AVAILABLE">AVAILABLE</option>
-              <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
-            </select>
-          </div>
+      {/* Thanh tìm kiếm và bộ lọc */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm món ăn (Phở, Bún bò, Pizza...)..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+        />
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            <option>Giá tăng dần</option>
+            <option>Giá giảm dần</option>
+          </select>
+          <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            <option>Tất cả trạng thái</option>
+            <option>Còn món (Available)</option>
+            <option>Hết món (Sold out)</option>
+          </select>
         </div>
+      </div>
 
-        <div className="mb-6 flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                activeCategory === cat
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+      {/* Các nút chuyển Category (Danh mục) */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {['All', 'Khai vị', 'Món chính', 'Tráng miệng', 'Đồ uống'].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              selectedCategory === cat
+                ? 'bg-emerald-600 text-white shadow'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
-        {loading ? (
-          <div className="py-8 text-center text-slate-500">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
-            <p className="mt-2">Đang tải thực đơn...</p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredFoods.map((food) => (
-              <div key={food.id} className="overflow-hidden rounded-xl border border-slate-200 shadow-sm transition hover:shadow-lg">
-                <div className="h-44 bg-slate-100">
-                  <img
-                    src={food.imageUrl || DEFAULT_IMAGE}
-                    alt={food.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => (e.target.src = DEFAULT_IMAGE)}
+      {/* Lưới hiển thị danh sách món ăn dạng Card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col justify-between hover:shadow-lg transition">
+              <div>
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover hover:scale-105 transition duration-300" 
                   />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="font-semibold text-slate-800">{food.name}</h3>
-                      <p className="mt-1 text-sm text-slate-500 line-clamp-2">{food.description || 'Món ăn đặc biệt'}</p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-1 text-xs font-medium ${
-                        food.status === 'AVAILABLE'
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-rose-100 text-rose-700'
-                      }`}
-                    >
-                      {food.status || 'AVAILABLE'}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-lg font-bold text-blue-700">
-                      {Number(food.price || 0).toLocaleString('vi-VN')}₫
-                    </span>
-                  </div>
-
-                  {/* Nút thao tác theo role */}
-                  <div className="mt-4 flex gap-2">
-                    {isCustomer ? (
-                      <>
-                        <button
-                          onClick={() => addToCart(food)}
-                          className="flex-1 rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-white hover:bg-amber-600"
-                        >
-                          Thêm vào đơn
-                        </button>
-                        <button
-                          onClick={() => createOrder(food)}
-                          className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                        >
-                          Đặt ngay
-                        </button>
-                      </>
-                    ) : user?.role === 'RestaurantStaff' ? (
-                      <button
-                        onClick={() => createOrder(food)}
-                        className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                      >
-                        Tạo đơn tại bàn
-                      </button>
-                    ) : canManage ? (
-                      <>
-                        <button
-                          onClick={() => openModal(food)}
-                          className="flex-1 rounded-lg bg-slate-200 px-3 py-2 text-sm font-medium hover:bg-slate-300"
-                        >
-                          ✎ Sửa
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFood(food.id)}
-                          className="flex-1 rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-700"
-                        >
-                          ✕ Xóa
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Khung hiển thị Không gian & Phòng ăn */}
-        <div className="mt-12 border-t border-slate-200 pt-8">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold text-slate-800">Không Gian & Phòng Ăn</h3>
-            <p className="text-sm text-slate-500">Khám phá các phòng ăn và sảnh tiệc sang trọng tại nhà hàng.</p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {diningRooms.map((room) => (
-              <div 
-                key={room.id} 
-                className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className="relative h-48 overflow-hidden bg-slate-100">
-                  <img
-                    src={room.imageUrl}
-                    alt={room.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <span className="absolute top-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-                    {room.type}
+                  <span className="absolute top-3 right-3 bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded shadow">
+                    {item.status}
                   </span>
                 </div>
                 <div className="p-4">
-                  <h4 className="text-lg font-bold text-slate-800 group-hover:text-blue-600">
-                    {room.title}
-                  </h4>
-                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">
-                    {room.description}
+                  <h3 className="font-bold text-lg text-gray-800 mb-1">{item.name}</h3>
+                  <p className="text-sm text-gray-500 line-clamp-2 mb-3">{item.description}</p>
+                  <p className="font-bold text-blue-600 text-lg">
+                    {item.price.toLocaleString('vi-VN')}đ
                   </p>
                 </div>
               </div>
-            ))}
+              <div className="p-4 pt-0">
+                <button
+                  onClick={() => handleOrder(item.name)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition text-sm shadow-sm"
+                >
+                  Tạo đơn tại bàn
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full py-12 text-center text-gray-500">
+            Không tìm thấy món ăn phù hợp với từ khóa của bạn.
           </div>
-        </div>
-
+        )}
       </div>
-
-      {/* Modal thêm/sửa món */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="mb-4 text-xl font-semibold">{editingId ? 'Chỉnh sửa món ăn' : 'Thêm món mới'}</h3>
-            <form onSubmit={handleSaveFood} className="space-y-3">
-              {imagePreview && (
-                <div className="flex justify-center">
-                  <img src={imagePreview} alt="Preview" className="h-40 w-40 rounded-lg object-cover" />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium">Image URL</label>
-                <input
-                  type="text"
-                  value={form.imageUrl}
-                  onChange={(e) => handleImageUrlChange(e.target.value)}
-                  placeholder="https://..."
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Upload ảnh</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-                />
-              </div>
-
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Tên món"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              />
-              <select
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              >
-                <option value="Appetizer">Khai vị</option>
-                <option value="MainCourse">Món chính</option>
-                <option value="Dessert">Tráng miệng</option>
-                <option value="Drink">Đồ uống</option>
-              </select>
-              <input
-                required
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                placeholder="Giá"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              />
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Mô tả"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2"
-                rows="3"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="rounded-lg bg-slate-200 px-4 py-2 font-medium hover:bg-slate-300"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-                >
-                  {editingId ? 'Cập nhật' : 'Lưu'} món
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-4 right-4 rounded-lg bg-slate-800 px-4 py-2 text-sm text-white">
-          {toast}
-        </div>
-      )}
     </div>
   );
-}
+};
+
+export default RestaurantMenu;
