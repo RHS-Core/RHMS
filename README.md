@@ -7,12 +7,15 @@ Restaurant & Hotel Management System (RHMS) là hệ thống quản lý tích h�
 Backend được tổ chức theo luồng chuẩn:
 
 ```mermaid
-flowchart LR
-	A[Routes] --> B[Middleware]
-	B --> C[Controller]
-	C --> D[Service]
-	D --> E[Model]
-	E --> F[(MySQL)]
+flowchart TD
+    U[User Login] --> R1[Restaurant APIs]
+    U --> H1[Hotel APIs]
+
+    R1 --> O[Order / Table / Food]
+    H1 --> B[Booking / Room]
+
+    O --> P[Payment]
+    B --> P
 ```
 
 Luồng nghiệp vụ chính:
@@ -129,11 +132,11 @@ Jest được cấu hình cho dự án ESM và Supertest được dùng cho inte
 
 ## Thành Viên Nhóm
 
-| Tên | MSSV | Vai trò |
-| --- | --- | --- |
-| Phan Thị Ngân Quỳnh | 24100457 | Nhóm trưởng |
-| Nghiêm Thị Mai Diễm | 24107772 | Thành viên |
-| Đặng Ngọc Khuê | 24100493 | Thành viên |
+| Tên | MSSV | Vai trò | Nội dung công việc |
+| --- | --- | --- | --- |
+| Phan Thị Ngân Quỳnh | 24100457 | Nhóm trưởng | Thiết kế và phát triển phân hệ Nhà hàng; xây dựng Authentication và các API liên quan; quản lý Git và biên soạn báo cáo. |
+| Nghiêm Thị Mai Diễm | 24107772 | Thành viên | Thiết kế và phát triển phân hệ Khách sạn; xây dựng các API liên quan và biên soạn báo cáo. |
+| Đặng Ngọc Khuê | 24100493 | Thành viên | Thiết kế và phát triển phân hệ Dịch vụ và Thanh toán; xây dựng các API và chức năng thanh toán. |
 
 ## Git Workflow
 
