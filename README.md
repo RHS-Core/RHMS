@@ -7,6 +7,17 @@ Restaurant & Hotel Management System (RHMS) là hệ thống quản lý tích h�
 Backend được tổ chức theo luồng chuẩn:
 
 ```mermaid
+flowchart LR
+	A[Routes] --> B[Middleware]
+	B --> C[Controller]
+	C --> D[Service]
+	D --> E[Model]
+	E --> F[(MySQL)]
+```
+
+Luồng nghiệp vụ chính:
+
+```mermaid
 flowchart TD
     U[User Login] --> R1[Restaurant APIs]
     U --> H1[Hotel APIs]
@@ -16,17 +27,6 @@ flowchart TD
 
     O --> P[Payment]
     B --> P
-```
-
-Luồng nghiệp vụ chính:
-
-```mermaid
-flowchart TD
-	U[User Login] --> R1[Restaurant APIs]
-	U --> H1[Hotel APIs]
-	R1 --> O[Order / Table / Food]
-	H1 --> B[Booking / Room]
-	O --> P[Payment]
 ```
 
 ## Cấu Trúc Thư Mục
